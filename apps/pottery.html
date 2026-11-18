@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<script>
+function JS(w, a = '을', b = '를') { const s = String(w).replace(/<[^>]*>/g, '').replace(/[\s'"」)\]】.!?]+$/, ''); const c = s.charCodeAt(s.length - 1); let f; if (c >= 0xAC00 && c <= 0xD7A3) f = (c - 0xAC00) % 28 > 0; else if (/[0-9]/.test(s.slice(-1))) f = '013678'.includes(s.slice(-1)); else f = /[lmnr]$/i.test(s); return f ? a : b; }
+// 혜광전과 소리 맞춤: 시작 화면에서 정한 소리 크기를 이 앱에도 써요.
+// 녹음 크기가 앱마다 달라서, 시작 음악과 같은 크기로 들리게 맞춰요 (NORM).
+(function () {
+  const NORM = 1.0;
+  const vol = () => { try { const v = localStorage.getItem('hub-vol'); return v == null ? 0.7 : Math.max(0, Math.min(1, +v)); } catch (e) { return 0.7; } };
+  try {
+    const P = (window.BaseAudioContext || window.AudioContext || window.webkitAudioContext).prototype;
+    const d = Object.getOwnPropertyDescriptor(P, 'destination');
+    if (d && d.get) {
+      const M = new WeakMap();
+      Object.defineProperty(P, 'destination', { configurable: true, get() {
+        let g = M.get(this);
+        if (!g) {
+          const real = d.get.call(this); g = this.createGain(); const lim = this.createDynamicsCompressor();
+          lim.threshold.value = -2; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.12;
+          g.gain.value = vol() * NORM; g.connect(lim); lim.connect(real); M.set(this, g);
+        }
+        return g;
+      } });
+    }
+  } catch (e) {}
+  try { const sp = speechSynthesis.speak.bind(speechSynthesis); speechSynthesis.speak = u => { try { u.volume = Math.min(1, (u.volume == null ? 1 : u.volume) * vol() / 0.7); } catch (e) {} return sp(u); }; } catch (e) {}
+  try { const pl = HTMLMediaElement.prototype.play; HTMLMediaElement.prototype.play = function () { try { if (!this._hubv) { this._hubv = 1; this.volume = Math.min(1, this.volume * vol() / 0.7 * NORM); } } catch (e) {} return pl.apply(this, arguments); }; } catch (e) {}
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>월이의 도예공방</title>
+<!-- 화면 꾸밈(Tailwind)을 파일 안에 넣어 두었어요: 인터넷이 없어도 화면이 그대로 나와요 -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap">
+<style id="tw">/*! tailwindcss v4.3.3 | MIT License | https://tailwindcss.com */
+@layer properties;
+@layer theme, base, components, utilities;
+@layer theme {
+  :root, :host {
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+      "Noto Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+      "Segoe UI Symbol", "Noto Color Emoji";
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+    --color-amber-50: oklch(98.7% 0.022 95.277);
+    --color-amber-100: oklch(96.2% 0.059 95.617);
+    --color-amber-200: oklch(92.4% 0.12 95.746);
+    --color-amber-300: oklch(87.9% 0.169 91.605);
+    --color-amber-400: oklch(82.8% 0.189 84.429);
+    --color-amber-500: oklch(76.9% 0.188 70.08);
+    --color-amber-600: oklch(66.6% 0.179 58.318);
+    --color-amber-700: oklch(55.5% 0.163 48.998);
+    --color-amber-800: oklch(47.3% 0.137 46.201);
+    --color-amber-900: oklch(41.4% 0.112 45.904);
+    --color-emerald-50: oklch(97.9% 0.021 166.113);
+    --color-emerald-200: oklch(90.5% 0.093 164.15);
+    --color-emerald-500: oklch(69.6% 0.17 162.48);
+    --color-emerald-800: oklch(43.2% 0.095 166.913);
+    --color-sky-100: oklch(95.1% 0.026 236.824);
+    --color-sky-200: oklch(90.1% 0.058 230.902);
+    --color-sky-800: oklch(44.3% 0.11 240.79);
+    --color-blue-50: oklch(97% 0.014 254.604);
+    --color-blue-200: oklch(88.2% 0.059 254.128);
+    --color-blue-500: oklch(62.3% 0.214 259.815);
+    --color-purple-50: oklch(97.7% 0.014 308.299);
+    --color-purple-200: oklch(90.2% 0.063 306.703);
+    --color-purple-500: oklch(62.7% 0.265 303.9);
+    --color-rose-50: oklch(96.9% 0.015 12.422);
+    --color-rose-100: oklch(94.1% 0.03 12.58);
+    --color-rose-200: oklch(89.2% 0.058 10.001);
+    --color-rose-700: oklch(51.4% 0.222 16.935);
+    --color-rose-800: oklch(45.5% 0.188 13.697);
+    --color-gray-200: oklch(92.8% 0.006 264.531);
+    --color-stone-50: oklch(98.5% 0.001 106.423);
+    --color-stone-100: oklch(97% 0.001 106.424);
+    --color-stone-200: oklch(92.3% 0.003 48.717);
+    --color-stone-300: oklch(86.9% 0.005 56.366);
+    --color-stone-400: oklch(70.9% 0.01 56.259);
+    --color-stone-500: oklch(55.3% 0.013 58.071);
+    --color-stone-600: oklch(44.4% 0.011 73.639);
+    --color-stone-700: oklch(37.4% 0.01 67.558);
+    --color-stone-800: oklch(26.8% 0.007 34.298);
+    --color-white: #fff;
+    --spacing: 0.25rem;
+    --container-4xl: 56rem;
+    --container-6xl: 72rem;
+    --text-sm: 0.875rem;
+    --text-sm--line-height: calc(1.25 / 0.875);
+    --text-base: 1rem;
+    --text-base--line-height: calc(1.5 / 1);
+    --text-lg: 1.125rem;
+    --text-lg--line-height: calc(1.75 / 1.125);
+    --text-xl: 1.25rem;
+    --text-xl--line-height: calc(1.75 / 1.25);
+    --text-2xl: 1.5rem;
+    --text-2xl--line-height: calc(2 / 1.5);
+    --text-3xl: 1.875rem;
+    --text-3xl--line-height: calc(2.25 / 1.875);
+    --text-4xl: 2.25rem;
+    --text-4xl--line-height: calc(2.5 / 2.25);
+    --text-5xl: 3rem;
+    --text-5xl--line-height: 1;
+    --text-6xl: 3.75rem;
+    --text-6xl--line-height: 1;
+    --text-7xl: 4.5rem;
+    --text-7xl--line-height: 1;
+    --text-8xl: 6rem;
+    --text-8xl--line-height: 1;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+    --font-weight-black: 900;
+    --radius-xl: 0.75rem;
+    --radius-2xl: 1rem;
+    --radius-3xl: 1.5rem;
+    --default-transition-duration: 150ms;
+    --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    --default-font-family: var(--font-sans);
+    --default-mono-font-family: var(--font-mono);
+  }
+}
+@layer base {
+  *, ::after, ::before, ::backdrop, ::file-selector-button {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0 solid;
+  }
+  html, :host {
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+    tab-size: 4;
+    font-family: var(--default-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");
+    font-feature-settings: var(--default-font-feature-settings, normal);
+    font-variation-settings: var(--default-font-variation-settings, normal);
+    -webkit-tap-highlight-color: transparent;
+  }
+  hr {
+    height: 0;
+    color: inherit;
+    border-top-width: 1px;
+  }
+  abbr:where([title]) {
+    -webkit-text-decoration: underline dotted;
+    text-decoration: underline dotted;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+  a {
+    color: inherit;
+    -webkit-text-decoration: inherit;
+    text-decoration: inherit;
+  }
+  b, strong {
+    font-weight: bolder;
+  }
+  code, kbd, samp, pre {
+    font-family: var(--default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);
+    font-feature-settings: var(--default-mono-font-feature-settings, normal);
+    font-variation-settings: var(--default-mono-font-variation-settings, normal);
+    font-size: 1em;
+  }
+  small {
+    font-size: 80%;
+  }
+  sub, sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+  }
+  sub {
+    bottom: -0.25em;
+  }
+  sup {
+    top: -0.5em;
+  }
+  table {
+    text-indent: 0;
+    border-color: inherit;
+    border-collapse: collapse;
+  }
+  :-moz-focusring:where(:not(iframe)) {
+    outline: auto;
+  }
+  progress {
+    vertical-align: baseline;
+  }
+  summary {
+    display: list-item;
+  }
+  ol, ul, menu {
+    list-style: none;
+  }
+  img, svg, video, canvas, audio, iframe, embed, object {
+    display: block;
+    vertical-align: middle;
+  }
+  img, video {
+    max-width: 100%;
+    height: auto;
+  }
+  button, input, select, optgroup, textarea, ::file-selector-button {
+    font: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    border-radius: 0;
+    background-color: transparent;
+    opacity: 1;
+  }
+  :where(select:is([multiple], [size])) optgroup {
+    font-weight: bolder;
+  }
+  :where(select:is([multiple], [size])) optgroup option {
+    padding-inline-start: 20px;
+  }
+  ::file-selector-button {
+    margin-inline-end: 4px;
+  }
+  ::placeholder {
+    opacity: 1;
+  }
+  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {
+    ::placeholder {
+      color: currentcolor;
+      @supports (color: color-mix(in lab, red, red)) {
+        color: color-mix(in oklab, currentcolor 50%, transparent);
+      }
+    }
+  }
+  textarea {
+    resize: vertical;
+  }
+  ::-webkit-search-decoration {
+    -webkit-appearance: none;
+  }
+  ::-webkit-date-and-time-value {
+    min-height: 1lh;
+    text-align: inherit;
+  }
+  ::-webkit-datetime-edit {
+    display: inline-flex;
+  }
+  ::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+  }
+  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {
+    padding-block: 0;
+  }
+  ::-webkit-calendar-picker-indicator {
+    line-height: 1;
+  }
+  :-moz-ui-invalid {
+    box-shadow: none;
+  }
+  button, input:where([type="button"], [type="reset"], [type="submit"]), ::file-selector-button {
+    appearance: button;
+  }
+  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {
+    height: auto;
+  }
+  [hidden]:where(:not([hidden="until-found"])) {
+    display: none !important;
+  }
+}
+@layer utilities {
+  .visible {
+    visibility: visible;
+  }
+  .relative {
+    position: relative;
+  }
+  .m-0 {
+    margin: 0px;
+  }
+  .mx-auto {
+    margin-inline: auto;
+  }
+  .my-2 {
+    margin-block: calc(var(--spacing) * 2);
+  }
+  .mt-1 {
+    margin-top: var(--spacing);
+  }
+  .mt-2 {
+    margin-top: calc(var(--spacing) * 2);
+  }
+  .mt-6 {
+    margin-top: calc(var(--spacing) * 6);
+  }
+  .mt-10 {
+    margin-top: calc(var(--spacing) * 10);
+  }
+  .mb-2 {
+    margin-bottom: calc(var(--spacing) * 2);
+  }
+  .mb-3 {
+    margin-bottom: calc(var(--spacing) * 3);
+  }
+  .mb-4 {
+    margin-bottom: calc(var(--spacing) * 4);
+  }
+  .mb-5 {
+    margin-bottom: calc(var(--spacing) * 5);
+  }
+  .mb-6 {
+    margin-bottom: calc(var(--spacing) * 6);
+  }
+  .mb-8 {
+    margin-bottom: calc(var(--spacing) * 8);
+  }
+  .mb-10 {
+    margin-bottom: calc(var(--spacing) * 10);
+  }
+  .block {
+    display: block;
+  }
+  .flex {
+    display: flex;
+  }
+  .grid {
+    display: grid;
+  }
+  .hidden { display: none !important; }
+  .inline-block {
+    display: inline-block;
+  }
+  .h-4 {
+    height: calc(var(--spacing) * 4);
+  }
+  .h-9 {
+    height: calc(var(--spacing) * 9);
+  }
+  .h-10 {
+    height: calc(var(--spacing) * 10);
+  }
+  .h-28 {
+    height: calc(var(--spacing) * 28);
+  }
+  .h-36 {
+    height: calc(var(--spacing) * 36);
+  }
+  .h-56 {
+    height: calc(var(--spacing) * 56);
+  }
+  .h-64 {
+    height: calc(var(--spacing) * 64);
+  }
+  .h-full {
+    height: 100%;
+  }
+  .min-h-screen {
+    min-height: 100vh;
+  }
+  .w-4 {
+    width: calc(var(--spacing) * 4);
+  }
+  .w-9 {
+    width: calc(var(--spacing) * 9);
+  }
+  .w-10 {
+    width: calc(var(--spacing) * 10);
+  }
+  .w-32 {
+    width: calc(var(--spacing) * 32);
+  }
+  .w-56 {
+    width: calc(var(--spacing) * 56);
+  }
+  .w-64 {
+    width: calc(var(--spacing) * 64);
+  }
+  .w-full {
+    width: 100%;
+  }
+  .max-w-4xl {
+    max-width: var(--container-4xl);
+  }
+  .max-w-6xl {
+    max-width: var(--container-6xl);
+  }
+  .flex-1 {
+    flex: 1;
+  }
+  .shrink-0 {
+    flex-shrink: 0;
+  }
+  .scale-110 {
+    --tw-scale-x: 110%;
+    --tw-scale-y: 110%;
+    --tw-scale-z: 110%;
+    scale: var(--tw-scale-x) var(--tw-scale-y);
+  }
+  .transform {
+    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
+  }
+  .cursor-pointer {
+    cursor: pointer;
+  }
+  .list-none {
+    list-style-type: none;
+  }
+  .grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .flex-col {
+    flex-direction: column;
+  }
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
+  .items-center {
+    align-items: center;
+  }
+  .items-end {
+    align-items: flex-end;
+  }
+  .items-start {
+    align-items: flex-start;
+  }
+  .justify-between {
+    justify-content: space-between;
+  }
+  .justify-center {
+    justify-content: center;
+  }
+  .gap-2 {
+    gap: calc(var(--spacing) * 2);
+  }
+  .gap-3 {
+    gap: calc(var(--spacing) * 3);
+  }
+  .gap-4 {
+    gap: calc(var(--spacing) * 4);
+  }
+  .gap-5 {
+    gap: calc(var(--spacing) * 5);
+  }
+  .gap-6 {
+    gap: calc(var(--spacing) * 6);
+  }
+  :where(.space-y-3 > :not(:last-child)) {
+    --tw-space-y-reverse: 0;
+    margin-block-start: calc(calc(var(--spacing) * 3) * var(--tw-space-y-reverse));
+    margin-block-end: calc(calc(var(--spacing) * 3) * calc(1 - var(--tw-space-y-reverse)));
+  }
+  .self-center {
+    align-self: center;
+  }
+  .overflow-hidden {
+    overflow: hidden;
+  }
+  .rounded-2xl {
+    border-radius: var(--radius-2xl);
+  }
+  .rounded-3xl {
+    border-radius: var(--radius-3xl);
+  }
+  .rounded-full {
+    border-radius: calc(infinity * 1px);
+  }
+  .rounded-xl {
+    border-radius: var(--radius-xl);
+  }
+  .border {
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+  }
+  .border-2 {
+    border-style: var(--tw-border-style);
+    border-width: 2px;
+  }
+  .border-4 {
+    border-style: var(--tw-border-style);
+    border-width: 4px;
+  }
+  .border-amber-100 {
+    border-color: var(--color-amber-100);
+  }
+  .border-amber-200 {
+    border-color: var(--color-amber-200);
+  }
+  .border-amber-300 {
+    border-color: var(--color-amber-300);
+  }
+  .border-amber-700 {
+    border-color: var(--color-amber-700);
+  }
+  .border-blue-200 {
+    border-color: var(--color-blue-200);
+  }
+  .border-emerald-200 {
+    border-color: var(--color-emerald-200);
+  }
+  .border-purple-200 {
+    border-color: var(--color-purple-200);
+  }
+  .border-rose-200 {
+    border-color: var(--color-rose-200);
+  }
+  .border-stone-200 {
+    border-color: var(--color-stone-200);
+  }
+  .bg-amber-50 {
+    background-color: var(--color-amber-50);
+  }
+  .bg-amber-100 {
+    background-color: var(--color-amber-100);
+  }
+  .bg-amber-200 {
+    background-color: var(--color-amber-200);
+  }
+  .bg-amber-500 {
+    background-color: var(--color-amber-500);
+  }
+  .bg-amber-600 {
+    background-color: var(--color-amber-600);
+  }
+  .bg-amber-700 {
+    background-color: var(--color-amber-700);
+  }
+  .bg-blue-50 {
+    background-color: var(--color-blue-50);
+  }
+  .bg-blue-200 {
+    background-color: var(--color-blue-200);
+  }
+  .bg-emerald-50 {
+    background-color: var(--color-emerald-50);
+  }
+  .bg-emerald-200 {
+    background-color: var(--color-emerald-200);
+  }
+  .bg-purple-50 {
+    background-color: var(--color-purple-50);
+  }
+  .bg-purple-200 {
+    background-color: var(--color-purple-200);
+  }
+  .bg-rose-50 {
+    background-color: var(--color-rose-50);
+  }
+  .bg-rose-100 {
+    background-color: var(--color-rose-100);
+  }
+  .bg-sky-100 {
+    background-color: var(--color-sky-100);
+  }
+  .bg-stone-50 {
+    background-color: var(--color-stone-50);
+  }
+  .bg-stone-100 {
+    background-color: var(--color-stone-100);
+  }
+  .bg-stone-200 {
+    background-color: var(--color-stone-200);
+  }
+  .bg-transparent {
+    background-color: transparent;
+  }
+  .bg-white {
+    background-color: var(--color-white);
+  }
+  .p-2 {
+    padding: calc(var(--spacing) * 2);
+  }
+  .p-4 {
+    padding: calc(var(--spacing) * 4);
+  }
+  .p-5 {
+    padding: calc(var(--spacing) * 5);
+  }
+  .p-6 {
+    padding: calc(var(--spacing) * 6);
+  }
+  .p-8 {
+    padding: calc(var(--spacing) * 8);
+  }
+  .px-3 {
+    padding-inline: calc(var(--spacing) * 3);
+  }
+  .px-4 {
+    padding-inline: calc(var(--spacing) * 4);
+  }
+  .px-5 {
+    padding-inline: calc(var(--spacing) * 5);
+  }
+  .px-6 {
+    padding-inline: calc(var(--spacing) * 6);
+  }
+  .px-8 {
+    padding-inline: calc(var(--spacing) * 8);
+  }
+  .px-10 {
+    padding-inline: calc(var(--spacing) * 10);
+  }
+  .px-12 {
+    padding-inline: calc(var(--spacing) * 12);
+  }
+  .py-1 {
+    padding-block: var(--spacing);
+  }
+  .py-2 {
+    padding-block: calc(var(--spacing) * 2);
+  }
+  .py-3 {
+    padding-block: calc(var(--spacing) * 3);
+  }
+  .py-4 {
+    padding-block: calc(var(--spacing) * 4);
+  }
+  .py-5 {
+    padding-block: calc(var(--spacing) * 5);
+  }
+  .py-14 {
+    padding-block: calc(var(--spacing) * 14);
+  }
+  .py-16 {
+    padding-block: calc(var(--spacing) * 16);
+  }
+  .pl-10 {
+    padding-left: calc(var(--spacing) * 10);
+  }
+  .text-center {
+    text-align: center;
+  }
+  .text-left {
+    text-align: left;
+  }
+  .text-2xl {
+    font-size: var(--text-2xl);
+    line-height: var(--tw-leading, var(--text-2xl--line-height));
+  }
+  .text-3xl {
+    font-size: var(--text-3xl);
+    line-height: var(--tw-leading, var(--text-3xl--line-height));
+  }
+  .text-4xl {
+    font-size: var(--text-4xl);
+    line-height: var(--tw-leading, var(--text-4xl--line-height));
+  }
+  .text-5xl {
+    font-size: var(--text-5xl);
+    line-height: var(--tw-leading, var(--text-5xl--line-height));
+  }
+  .text-6xl {
+    font-size: var(--text-6xl);
+    line-height: var(--tw-leading, var(--text-6xl--line-height));
+  }
+  .text-7xl {
+    font-size: var(--text-7xl);
+    line-height: var(--tw-leading, var(--text-7xl--line-height));
+  }
+  .text-8xl {
+    font-size: var(--text-8xl);
+    line-height: var(--tw-leading, var(--text-8xl--line-height));
+  }
+  .text-base {
+    font-size: var(--text-base);
+    line-height: var(--tw-leading, var(--text-base--line-height));
+  }
+  .text-lg {
+    font-size: var(--text-lg);
+    line-height: var(--tw-leading, var(--text-lg--line-height));
+  }
+  .text-sm {
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+  }
+  .text-xl {
+    font-size: var(--text-xl);
+    line-height: var(--tw-leading, var(--text-xl--line-height));
+  }
+  .font-black {
+    --tw-font-weight: var(--font-weight-black);
+    font-weight: var(--font-weight-black);
+  }
+  .font-bold {
+    --tw-font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-bold);
+  }
+  .font-extrabold {
+    --tw-font-weight: var(--font-weight-extrabold);
+    font-weight: var(--font-weight-extrabold);
+  }
+  .font-medium {
+    --tw-font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-medium);
+  }
+  .font-semibold {
+    --tw-font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-semibold);
+  }
+  .text-amber-700 {
+    color: var(--color-amber-700);
+  }
+  .text-amber-900 {
+    color: var(--color-amber-900);
+  }
+  .text-emerald-800 {
+    color: var(--color-emerald-800);
+  }
+  .text-rose-700 {
+    color: var(--color-rose-700);
+  }
+  .text-rose-800 {
+    color: var(--color-rose-800);
+  }
+  .text-sky-800 {
+    color: var(--color-sky-800);
+  }
+  .text-stone-300 {
+    color: var(--color-stone-300);
+  }
+  .text-stone-400 {
+    color: var(--color-stone-400);
+  }
+  .text-stone-500 {
+    color: var(--color-stone-500);
+  }
+  .text-stone-600 {
+    color: var(--color-stone-600);
+  }
+  .text-stone-700 {
+    color: var(--color-stone-700);
+  }
+  .text-stone-800 {
+    color: var(--color-stone-800);
+  }
+  .text-white {
+    color: var(--color-white);
+  }
+  .shadow-2xl {
+    --tw-shadow: 0 25px 50px -12px var(--tw-shadow-color, rgb(0 0 0 / 0.25));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .shadow-lg {
+    --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .shadow-md {
+    --tw-shadow: 0 4px 6px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 2px 4px -2px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .transition-all {
+    transition-property: all;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .transition-transform {
+    transition-property: transform, translate, scale, rotate;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .duration-500 {
+    --tw-duration: 500ms;
+    transition-duration: 500ms;
+  }
+  @media (hover: hover) {
+    .hover\:scale-105:hover {
+      --tw-scale-x: 105%;
+      --tw-scale-y: 105%;
+      --tw-scale-z: 105%;
+      scale: var(--tw-scale-x) var(--tw-scale-y);
+    }
+    .hover\:border-amber-400:hover {
+      border-color: var(--color-amber-400);
+    }
+    .hover\:border-amber-500:hover {
+      border-color: var(--color-amber-500);
+    }
+    .hover\:border-blue-500:hover {
+      border-color: var(--color-blue-500);
+    }
+    .hover\:border-emerald-500:hover {
+      border-color: var(--color-emerald-500);
+    }
+    .hover\:border-purple-500:hover {
+      border-color: var(--color-purple-500);
+    }
+    .hover\:bg-amber-50:hover {
+      background-color: var(--color-amber-50);
+    }
+    .hover\:bg-amber-800:hover {
+      background-color: var(--color-amber-800);
+    }
+    .hover\:bg-sky-200:hover {
+      background-color: var(--color-sky-200);
+    }
+    .hover\:bg-stone-200:hover {
+      background-color: var(--color-stone-200);
+    }
+    .hover\:bg-stone-300:hover {
+      background-color: var(--color-stone-300);
+    }
+    .hover\:text-stone-600:hover {
+      color: var(--color-stone-600);
+    }
+  }
+  @media (width >= 48rem) {
+    .md\:h-64 {
+      height: calc(var(--spacing) * 64);
+    }
+    .md\:w-80 {
+      width: calc(var(--spacing) * 80);
+    }
+    .md\:grid-cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .md\:grid-cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .md\:grid-cols-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .md\:flex-row {
+      flex-direction: row;
+    }
+    .md\:p-8 {
+      padding: calc(var(--spacing) * 8);
+    }
+    .md\:p-10 {
+      padding: calc(var(--spacing) * 10);
+    }
+    .md\:text-3xl {
+      font-size: var(--text-3xl);
+      line-height: var(--tw-leading, var(--text-3xl--line-height));
+    }
+    .md\:text-4xl {
+      font-size: var(--text-4xl);
+      line-height: var(--tw-leading, var(--text-4xl--line-height));
+    }
+    .md\:text-5xl {
+      font-size: var(--text-5xl);
+      line-height: var(--tw-leading, var(--text-5xl--line-height));
+    }
+    .md\:text-7xl {
+      font-size: var(--text-7xl);
+      line-height: var(--tw-leading, var(--text-7xl--line-height));
+    }
+    .md\:text-base {
+      font-size: var(--text-base);
+      line-height: var(--tw-leading, var(--text-base--line-height));
+    }
+  }
+  @media (width >= 64rem) {
+    .lg\:grid-cols-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .lg\:grid-cols-5 {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+}
+@layer base {
+  *, ::after, ::before, ::backdrop, ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+  button:not(:disabled), [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+@property --tw-scale-x {
+  syntax: "*";
+  inherits: false;
+  initial-value: 1;
+}
+@property --tw-scale-y {
+  syntax: "*";
+  inherits: false;
+  initial-value: 1;
+}
+@property --tw-scale-z {
+  syntax: "*";
+  inherits: false;
+  initial-value: 1;
+}
+@property --tw-rotate-x {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-rotate-y {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-rotate-z {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-skew-x {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-skew-y {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-space-y-reverse {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
+@property --tw-border-style {
+  syntax: "*";
+  inherits: false;
+  initial-value: solid;
+}
+@property --tw-font-weight {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-inset-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-inset-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-inset-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-ring-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ring-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-inset-ring-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-inset-ring-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-ring-inset {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ring-offset-width {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --tw-ring-offset-color {
+  syntax: "*";
+  inherits: false;
+  initial-value: #fff;
+}
+@property --tw-ring-offset-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-duration {
+  syntax: "*";
+  inherits: false;
+}
+@layer properties {
+  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
+    *, ::before, ::after, ::backdrop {
+      --tw-scale-x: 1;
+      --tw-scale-y: 1;
+      --tw-scale-z: 1;
+      --tw-rotate-x: initial;
+      --tw-rotate-y: initial;
+      --tw-rotate-z: initial;
+      --tw-skew-x: initial;
+      --tw-skew-y: initial;
+      --tw-space-y-reverse: 0;
+      --tw-border-style: solid;
+      --tw-font-weight: initial;
+      --tw-shadow: 0 0 #0000;
+      --tw-shadow-color: initial;
+      --tw-shadow-alpha: 100%;
+      --tw-inset-shadow: 0 0 #0000;
+      --tw-inset-shadow-color: initial;
+      --tw-inset-shadow-alpha: 100%;
+      --tw-ring-color: initial;
+      --tw-ring-shadow: 0 0 #0000;
+      --tw-inset-ring-color: initial;
+      --tw-inset-ring-shadow: 0 0 #0000;
+      --tw-ring-inset: initial;
+      --tw-ring-offset-width: 0px;
+      --tw-ring-offset-color: #fff;
+      --tw-ring-offset-shadow: 0 0 #0000;
+      --tw-duration: initial;
+    }
+  }
+}
+</style>
+<style>
+  
+  body { font-family: 'Jua', 'Malgun Gothic', sans-serif; background-color: #fdfbf7; }
+  .card-pick { transition: all .2s; }
+  .card-pick:hover { transform: translateY(-4px); }
+  .guide-line { font-size: 1.35rem; line-height: 2.1rem; }
+  #print-area { display: none; }
+  @media print {
+    body > *:not(#print-area) { display: none !important; }
+    body { display: block !important; background: #fff !important; }
+    #print-area { display: block !important; width: 100%; }
+    .print-step { page-break-inside: avoid; }
+  }
+</style>
+<style id="hub-look">
+  /* 혜광전과 다른 앱들과 같은 모양: 주아 글꼴, 파스텔 배경, 테두리 카드, 입체 단추 */
+  :root { --hb-bg: #fdf6e7; --hb-bd: #fde68a; --hb-sh: #f6c85f; }
+  html, body { background: var(--hb-bg) !important; }
+  body, button, input, select, textarea { font-family: 'Jua', 'Malgun Gothic', sans-serif !important; }
+  h1, h2, h3, h4, h5, b, strong, [class*="font-bold"], [class*="font-semibold"], [class*="font-extrabold"], [class*="font-black"], [class*="font-medium"] { font-weight: normal !important; }
+  body > div.shadow-2xl { border: 4px solid var(--hb-bd) !important; border-radius: 28px !important; box-shadow: 0 6px 0 var(--hb-sh) !important; }
+  button[class*="bg-"]:not([class*="bg-white"]):not([class*="bg-transparent"]):not(:disabled) { box-shadow: 0 5px 0 rgb(0 0 0 / .22) !important; border-radius: 18px; }
+  button:not(:disabled):active { transform: translateY(3px) !important; }
+  .card-pick { border-radius: 22px !important; box-shadow: 0 5px 0 var(--hb-sh) !important; }
+  .card-pick:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--hb-sh) !important; }
+  h1 { letter-spacing: .5px; }
+</style>
+</head>
+<body class="flex items-center justify-center min-h-screen m-0 p-4">
+
+<div class="w-full max-w-6xl bg-white shadow-2xl rounded-3xl overflow-hidden border border-amber-100 p-6 md:p-8 text-center relative">
+
+  <!-- 진행 표시줄 -->
+  <div id="progress-bar" class="hidden mb-6">
+    <div class="flex flex-wrap justify-center gap-2 text-sm md:text-base" id="progress-items"></div>
+  </div>
+
+  <!-- [화면 1] 시작 -->
+  <div id="step-1" class="py-16">
+    <div class="flex justify-center items-end gap-4 mb-6"><figure class="flex flex-col items-center"><img src="data:image/webp;base64,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" style="height:210px;object-fit:contain" alt="월이"><figcaption class="mt-1 text-lg" style="color:#0369a1">월이</figcaption></figure><figure class="flex flex-col items-center"><img src="data:image/webp;base64,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" style="height:190px;object-fit:contain" alt="아리"><figcaption class="mt-1 text-lg" style="color:#9333ea">아리</figcaption></figure></div>
+    <div class="inline-block bg-amber-50 border-2 border-amber-200 rounded-2xl px-5 py-2 text-lg text-stone-700 mb-5">“우리랑 같이 나만의 도자기를 만들어 봐요!”</div>
+    <h1 class="text-4xl md:text-5xl font-bold text-stone-800 mb-4">🏺 월이의 도예공방</h1>
+    <p class="text-stone-500 text-lg mb-3">내가 만들 도자기를 고르고 꾸며 봐요</p>
+    <p class="text-stone-600 text-lg mb-10">① 디자인하기 → ② 미리 보기 → ③ 한 단계씩 따라 만들기</p>
+    <button onclick="goToStep(2)" class="bg-amber-700 hover:bg-amber-800 text-white text-xl font-bold px-12 py-5 rounded-2xl shadow-lg transition-transform transform hover:scale-105">
+      디자인 시작하기 🎨
+    </button>
+    <div class="mt-10"><span style="display:inline-block;background:rgba(255,255,255,.88);color:#7c2d12;font-size:19px;padding:5px 20px;border-radius:99px;box-shadow:0 3px 8px rgba(90,40,10,.18)">✨ 크리에이터 <span style="color:#e8534a">강천석</span></span></div>
+  </div>
+
+  <!-- [화면 2] 대분류 -->
+  <div id="step-2" class="hidden py-4">
+    <h2 class="text-3xl font-bold text-stone-800 mb-2">1단계: 무엇을 만들까요?</h2>
+    <p class="text-stone-500 mb-8 text-lg">만들고 싶은 그림을 눌러 주세요.</p>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+      <div onclick="selectCategory('그릇')" class="card-pick bg-amber-50 border-4 border-amber-200 hover:border-amber-500 rounded-3xl p-6 cursor-pointer flex flex-col items-center shadow-md">
+        <div class="w-full h-36 bg-amber-200 rounded-2xl mb-4 flex items-center justify-center text-6xl">🥣</div>
+        <span class="text-2xl font-bold text-stone-800">그릇</span><span class="text-sm text-stone-500 mt-1">접시, 밥그릇, 컵 등</span>
+      </div>
+      <div onclick="selectCategory('화분')" class="card-pick bg-emerald-50 border-4 border-emerald-200 hover:border-emerald-500 rounded-3xl p-6 cursor-pointer flex flex-col items-center shadow-md">
+        <div class="w-full h-36 bg-emerald-200 rounded-2xl mb-4 flex items-center justify-center text-6xl">🪴</div>
+        <span class="text-2xl font-bold text-stone-800">화분</span><span class="text-sm text-stone-500 mt-1">대형, 중형, 소형</span>
+      </div>
+      <div onclick="selectCategory('장식품')" class="card-pick bg-purple-50 border-4 border-purple-200 hover:border-purple-500 rounded-3xl p-6 cursor-pointer flex flex-col items-center shadow-md">
+        <div class="w-full h-36 bg-purple-200 rounded-2xl mb-4 flex items-center justify-center text-6xl">🏮</div>
+        <span class="text-2xl font-bold text-stone-800">장식품</span><span class="text-sm text-stone-500 mt-1">타일, 촛대, 소품 등</span>
+      </div>
+      <div onclick="selectCategory('자유디자인')" class="card-pick bg-blue-50 border-4 border-blue-200 hover:border-blue-500 rounded-3xl p-6 cursor-pointer flex flex-col items-center shadow-md">
+        <div class="w-full h-36 bg-blue-200 rounded-2xl mb-4 flex items-center justify-center text-6xl">✨</div>
+        <span class="text-2xl font-bold text-stone-800">자유디자인</span><span class="text-sm text-stone-500 mt-1">나만의 상상 형태</span>
+      </div>
+    </div>
+    <button onclick="goToStep(1)" class="text-stone-400 hover:text-stone-600 font-bold text-lg">← 처음으로</button>
+  </div>
+
+  <!-- [화면 3] 소분류 -->
+  <div id="step-3" class="hidden py-4">
+    <h2 class="text-3xl font-bold text-stone-800 mb-2">2단계: 어떤 종류로 만들까요?</h2>
+    <p class="text-stone-500 mb-8 text-lg">원하는 그림을 눌러 주세요.</p>
+    <div id="sub-category-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8"></div>
+    <button onclick="goToStep(2)" class="text-stone-400 hover:text-stone-600 font-bold text-lg">← 이전으로</button>
+  </div>
+
+  <!-- [화면 4] 형태 -->
+  <div id="step-4" class="hidden py-4">
+    <h2 class="text-3xl font-bold text-stone-800 mb-2">3단계: 어떤 모양으로 만들까요?</h2>
+    <p class="text-stone-500 mb-8 text-lg">모양마다 만드는 방법이 달라요.</p>
+    <div id="shape-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 mb-8"></div>
+    <button onclick="goToStep(3)" class="text-stone-400 hover:text-stone-600 font-bold text-lg">← 이전으로</button>
+  </div>
+
+  <!-- [화면 5] 무늬 -->
+  <div id="step-5" class="hidden py-4">
+    <h2 class="text-3xl font-bold text-stone-800 mb-2">4단계: 어떤 무늬를 넣을까요?</h2>
+    <p class="text-stone-500 mb-8 text-lg">도자기를 꾸밀 무늬를 골라 주세요.</p>
+    <div id="pattern-container" class="grid grid-cols-2 md:grid-cols-3 gap-5 mb-8 max-w-4xl mx-auto"></div>
+    <button onclick="goToStep(4)" class="text-stone-400 hover:text-stone-600 font-bold text-lg">← 이전으로</button>
+  </div>
+
+  <!-- [화면 6] 색(유약) -->
+  <div id="step-6" class="hidden py-4">
+    <h2 class="text-3xl font-bold text-stone-800 mb-2">5단계: 어떤 색으로 칠할까요?</h2>
+    <p class="text-stone-500 mb-8 text-lg">도자기에 바르는 색 물감을 <b>유약</b>이라고 해요.</p>
+    <div id="glaze-container" class="grid grid-cols-2 md:grid-cols-3 gap-5 mb-8 max-w-4xl mx-auto"></div>
+    <button onclick="goToStep(5)" class="text-stone-400 hover:text-stone-600 font-bold text-lg">← 이전으로</button>
+  </div>
+
+  <!-- [화면 7] 미리보기 -->
+  <div id="step-7" class="hidden py-4">
+    <h2 class="text-3xl font-bold text-stone-800 mb-2">6단계: 내 디자인 미리 보기</h2>
+    <p class="text-stone-500 mb-6 text-lg">내가 고른 디자인이에요. 마음에 들면 만들러 가요!</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-8">
+      <div class="bg-stone-50 border-4 border-amber-300 rounded-3xl p-6 flex flex-col items-center justify-center shadow-lg">
+        <div id="preview-svg" class="w-64 h-64"></div>
+        <span id="sim-caption" class="font-bold text-stone-800 text-lg mt-2"></span>
+      </div>
+      <div class="bg-amber-50 border-2 border-amber-200 rounded-3xl p-6 text-left flex flex-col justify-center gap-2 text-lg text-stone-700">
+        <p>📌 종류: <b id="res-category" class="text-amber-900"></b> · <b id="res-sub" class="text-amber-900"></b></p>
+        <p>📏 크기: <span id="res-desc"></span></p>
+        <p>🎨 모양: <b id="res-shape" class="text-amber-900"></b></p>
+        <p>🌸 무늬: <b id="res-pattern" class="text-amber-900"></b></p>
+        <p>🖌️ 색: <b id="res-glaze" class="text-amber-900"></b></p>
+        <hr class="my-2 border-amber-200">
+        <p>🛠️ 만드는 방법: <b id="res-method" class="text-amber-900"></b></p>
+        <p>⚖️ 필요한 흙: <b id="res-clay" class="text-amber-900"></b></p>
+        <p>⏰ 걸리는 시간: <span>만들기 2~3시간 + 말리기 1~2주 + 굽기</span></p>
+      </div>
+    </div>
+    <div class="flex flex-wrap justify-center gap-4">
+      <button onclick="startGuide()" class="bg-amber-700 hover:bg-amber-800 text-white text-xl font-bold px-10 py-4 rounded-2xl shadow-lg">만드는 방법 보기 🛠️</button>
+      <button onclick="goToStep(4)" class="bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold px-6 py-4 rounded-2xl">디자인 바꾸기</button>
+    </div>
+  </div>
+
+  <!-- [화면 8] 단계별 제작 가이드 -->
+  <div id="step-8" class="hidden py-2">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <h2 class="text-2xl md:text-3xl font-bold text-stone-800">🛠️ <span id="guide-title"></span> 만들기</h2>
+      <div class="flex gap-2">
+        <button onclick="printGuide()" class="bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold px-4 py-2 rounded-xl">🖨️ 전체 인쇄</button>
+        <button onclick="goToStep(7)" class="bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold px-4 py-2 rounded-xl">내 디자인 보기</button>
+      </div>
+    </div>
+
+    <!-- 진행 막대 -->
+    <div class="w-full bg-stone-200 rounded-full h-4 mb-2 overflow-hidden">
+      <div id="guide-bar" class="bg-amber-500 h-4 rounded-full transition-all duration-500" style="width:0%"></div>
+    </div>
+    <div id="guide-dots" class="flex flex-wrap justify-center gap-2 mb-5"></div>
+
+    <!-- 단계 카드 -->
+    <div id="guide-card" class="bg-amber-50 border-4 border-amber-300 rounded-3xl p-6 md:p-10 text-left shadow-lg max-w-4xl mx-auto">
+      <div class="flex items-center gap-5 mb-5">
+        <div id="g-icon" class="text-6xl md:text-7xl"></div>
+        <div>
+          <div id="g-num" class="text-amber-700 font-bold text-lg"></div>
+          <h3 id="g-title" class="text-3xl md:text-4xl font-bold text-stone-800"></h3>
+          <span id="g-teacher" class="hidden inline-block mt-2 bg-rose-100 text-rose-700 font-bold px-3 py-1 rounded-full text-base">👩‍🏫 선생님과 함께해요</span>
+        </div>
+      </div>
+      <div class="flex flex-col md:flex-row gap-6 items-start mb-5">
+        <div id="g-pic" class="w-full md:w-80 h-56 md:h-64 shrink-0 bg-white border-2 border-amber-200 rounded-2xl p-2 flex items-center justify-center"></div>
+        <ol id="g-lines" class="list-none space-y-3 flex-1"></ol>
+      </div>
+      <div id="g-tip" class="hidden bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-lg text-emerald-800 mb-3"></div>
+      <div id="g-caution" class="hidden bg-rose-50 border-2 border-rose-200 rounded-2xl p-4 text-lg text-rose-800"></div>
+    </div>
+
+    <div class="flex flex-wrap justify-center gap-4 mt-6">
+      <button id="btn-prev" onclick="moveGuide(-1)" class="bg-stone-200 hover:bg-stone-300 text-stone-800 text-xl font-bold px-8 py-4 rounded-2xl">◀ 이전</button>
+      <button onclick="speakStep()" class="bg-sky-100 hover:bg-sky-200 text-sky-800 text-xl font-bold px-8 py-4 rounded-2xl">🔊 읽어 주기</button>
+      <button id="btn-next" onclick="moveGuide(1)" class="bg-amber-700 hover:bg-amber-800 text-white text-xl font-bold px-10 py-4 rounded-2xl shadow-lg">다 했어요! 다음 ▶</button>
+    </div>
+  </div>
+
+  <!-- [화면 9] 완성 -->
+  <div id="step-9" class="hidden py-14">
+    <div class="text-7xl mb-4">🎉</div>
+    <h2 class="text-4xl font-bold text-stone-800 mb-4">모든 단계를 끝냈어요!</h2>
+    <p class="text-xl text-stone-600 mb-8">멋진 <b id="done-name"></b><span id="done-jo">을(를)</span> 완성했어요. 정말 잘했어요! 👏</p>
+    <div class="w-56 h-56 mx-auto mb-8" id="done-svg"></div>
+    <div class="flex flex-wrap justify-center gap-4">
+      <button onclick="printGuide()" class="bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold px-6 py-3 rounded-xl">🖨️ 가이드 인쇄</button>
+      <button onclick="resetAll()" class="bg-amber-700 hover:bg-amber-800 text-white font-bold px-8 py-3 rounded-xl">새로 디자인하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 인쇄용 -->
+<div id="print-area" class="p-8 text-left"></div>
+
+<script>
+// ===================== 데이터 =====================
+const subCategories = {
+  '그릇': [
+    { name:'접시', emoji:'🍽️', desc:'지름 15~25cm, 높이 2~4cm', clay:'약 600g (주먹 2개)' },
+    { name:'냉면기', emoji:'🍜', desc:'지름 16~20cm, 높이 7~9cm', clay:'약 800g (주먹 3개)' },
+    { name:'컵', emoji:'☕', desc:'지름 8~10cm, 높이 9~12cm', clay:'약 400g (주먹 1개 반)' },
+    { name:'밥그릇', emoji:'🍚', desc:'지름 11~13cm, 높이 6~7cm', clay:'약 400g (주먹 1개 반)' },
+    { name:'국그릇', emoji:'🍲', desc:'지름 13~15cm, 높이 6~8cm', clay:'약 500g (주먹 2개)' },
+    { name:'반찬그릇', emoji:'🥗', desc:'지름 9~12cm, 높이 4~6cm', clay:'약 300g (주먹 1개)' },
+    { name:'종지', emoji:'🧂', desc:'지름 7~9cm, 높이 3~4cm', clay:'약 200g (귤 1개 크기)' }
+  ],
+  '화분': [
+    { name:'대형 화분', emoji:'🪴', desc:'지름 20~30cm, 높이 20~25cm', clay:'약 2kg (주먹 7개)' },
+    { name:'중형 화분', emoji:'🌿', desc:'지름 13~18cm, 높이 12~17cm', clay:'약 1kg (주먹 4개)' },
+    { name:'소형 화분', emoji:'🌱', desc:'지름 8~12cm, 높이 8~11cm', clay:'약 500g (주먹 2개)' }
+  ],
+  '장식품': [
+    { name:'타일', emoji:'🟧', desc:'가로세로 10~20cm, 두께 1cm', clay:'약 400g (주먹 1개 반)' },
+    { name:'자석장식', emoji:'🧲', desc:'크기 5~8cm (냉장고 부착용)', clay:'약 100g (탁구공 2개 크기)' },
+    { name:'촛대', emoji:'🕯️', desc:'지름 8~12cm, 높이 5~10cm', clay:'약 300g (주먹 1개)' },
+    { name:'장식소품', emoji:'🗿', desc:'자유 크기 오브제·동물 모양', clay:'약 300g (주먹 1개)' },
+    { name:'미니 항아리', emoji:'🏺', desc:'높이 10~15cm 감상용 항아리', clay:'약 600g (주먹 2개)' }
+  ],
+  '자유디자인': [
+    { name:'나만의 상상 형태', emoji:'✨', desc:'학생 개별 맞춤 크기', clay:'약 500g (주먹 2개)' }
+  ]
+};
+
+const shapes = [
+  { key:'cylinder', name:'원기둥형', emoji:'🥫', hint:'흙가래 쌓기' },
+  { key:'sphere',   name:'구형 (둥근형)', emoji:'🟠', hint:'반쪽 두 개 붙이기' },
+  { key:'bowl',     name:'반원형 (대접형)', emoji:'🥣', hint:'엄지로 눌러 빚기' },
+  { key:'box',      name:'사각기둥형', emoji:'📦', hint:'흙판 붙이기' },
+  { key:'free',     name:'자유형태', emoji:'✨', hint:'손으로 빚기' }
+];
+
+const patterns = [
+  { key:'none',   name:'무늬 없음', emoji:'⚪', how:'매끈하게' },
+  { key:'dots',   name:'점 무늬', emoji:'🔵', how:'콕콕 찍기' },
+  { key:'stripes',name:'줄 무늬', emoji:'〰️', how:'선 긋기' },
+  { key:'waves',  name:'물결 무늬', emoji:'🌊', how:'포크로 긁기' },
+  { key:'flowers',name:'꽃 무늬', emoji:'🌸', how:'꽃 붙이기' },
+  { key:'leaves', name:'나뭇잎 찍기', emoji:'🍃', how:'잎 눌러 찍기' }
+];
+
+const glazes = [
+  { name:'흰색', color:'#f4f1ea' },
+  { name:'옥색 (청자 빛깔)', color:'#9fc5b0' },
+  { name:'갈색', color:'#a8693a' },
+  { name:'하늘색', color:'#8ec5e8' },
+  { name:'분홍색', color:'#f2b5c4' },
+  { name:'노란색', color:'#f3d36b' }
+];
+
+const methodNames = {
+  pinch:'엄지로 눌러 빚기 (핀칭)', coil:'흙가래 쌓기 (코일링)', slab:'흙판 붙이기 (판 성형)',
+  sphere:'반쪽 두 개 붙이기', flat:'흙판 오리기', mold:'틀에 덮어 만들기', free:'손으로 자유롭게 빚기'
+};
+
+let sel = {};
+let guideSteps = [];
+let guideIdx = 0;
+
+// ===================== 화면 이동 =====================
+const progressLabels = ['종류','세부','모양','무늬','색','미리보기','만들기'];
+function goToStep(step) {
+  for (let i = 1; i <= 9; i++) document.getElementById('step-' + i).classList.add('hidden');
+  document.getElementById('step-' + step).classList.remove('hidden');
+  if (window.speechSynthesis) speechSynthesis.cancel();
+  const bar = document.getElementById('progress-bar');
+  if (step >= 2 && step <= 8) {
+    bar.classList.remove('hidden');
+    document.getElementById('progress-items').innerHTML = progressLabels.map((l, i) => {
+      const n = i + 2;
+      const cls = n < step ? 'bg-amber-200 text-amber-900' : n === step ? 'bg-amber-600 text-white' : 'bg-stone-100 text-stone-400';
+      return `<span class="${cls} px-3 py-1 rounded-full font-bold">${n < step ? '✔ ' : ''}${l}</span>`;
+    }).join('<span class="text-stone-300 self-center">›</span>');
+  } else bar.classList.add('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function pickCard(emoji, title, sub, onclick, extra = '') {
+  return `<div onclick="${onclick}" class="card-pick bg-stone-50 hover:bg-amber-50 border-4 border-stone-200 hover:border-amber-400 rounded-3xl p-5 cursor-pointer flex flex-col items-center shadow-md">
+    <div class="w-full h-28 bg-amber-100 rounded-2xl mb-3 flex items-center justify-center text-5xl" ${extra}>${emoji}</div>
+    <span class="text-xl font-bold text-stone-800">${title}</span>
+    <span class="text-sm text-stone-500 text-center mt-1">${sub}</span></div>`;
+}
+
+function selectCategory(category) {
+  sel.category = category;
+  document.getElementById('sub-category-container').innerHTML =
+    subCategories[category].map((it, i) => pickCard(it.emoji, it.name, it.desc, `selectSub(${i})`)).join('');
+  goToStep(3);
+}
+
+function selectSub(i) {
+  Object.assign(sel, subCategories[sel.category][i]);
+  sel.subCategory = sel.name;
+  const flatOnly = ['타일', '자석장식'].includes(sel.subCategory);
+  const list = flatOnly ? [{ key:'flat', name:'납작한 판 모양', emoji:'⬜', hint:'흙판 오리기' }] : shapes;
+  document.getElementById('shape-container').innerHTML =
+    list.map(s => pickCard(`<div class="h-28 w-32">${drawShape(s.key, CL, 'none', sel.subCategory === '자석장식' ? '자석장식' : '', sel.category)}</div>`, s.name, '만드는 법: ' + s.hint, `selectShape('${s.key}','${s.name}')`)).join('');
+  goToStep(4);
+}
+
+function selectShape(key, name) {
+  sel.shapeKey = key; sel.shape = name;
+  document.getElementById('pattern-container').innerHTML =
+    patterns.map((p, i) => pickCard(`<div class="h-28 w-32">${drawShape(sel.shapeKey, CL, p.key, sel.subCategory, sel.category)}</div>`, p.name, p.how, `selectPattern(${i})`)).join('');
+  goToStep(5);
+}
+
+function selectPattern(i) {
+  sel.pattern = patterns[i];
+  document.getElementById('glaze-container').innerHTML = glazes.map((g, i) =>
+    `<div onclick="selectGlaze(${i})" class="card-pick bg-stone-50 border-4 border-stone-200 hover:border-amber-400 rounded-3xl p-5 cursor-pointer flex flex-col items-center shadow-md">
+      <div class="w-32 h-28 mb-3">${drawShape(sel.shapeKey, g.color, sel.pattern.key, sel.subCategory, sel.category)}</div>
+      <span class="text-xl font-bold text-stone-800">${g.name}</span></div>`).join('');
+  goToStep(6);
+}
+
+function selectGlaze(i) {
+  sel.glaze = glazes[i];
+  sel.method = getMethod();
+  document.getElementById('res-category').innerText = sel.category;
+  document.getElementById('res-sub').innerText = sel.subCategory;
+  document.getElementById('res-desc').innerText = sel.desc;
+  document.getElementById('res-shape').innerText = sel.shape;
+  document.getElementById('res-pattern').innerText = sel.pattern.name;
+  document.getElementById('res-glaze').innerText = sel.glaze.name;
+  document.getElementById('res-method').innerText = methodNames[sel.method];
+  document.getElementById('res-clay').innerText = sel.clay;
+  document.getElementById('preview-svg').innerHTML = drawPot();
+  document.getElementById('sim-caption').innerText = `${sel.glaze.name} ${sel.subCategory}`;
+  goToStep(7);
+}
+
+// ===================== 미리보기 그림 (SVG) =====================
+function shade(hex, amt) {
+  const n = parseInt(hex.slice(1), 16);
+  const c = v => Math.max(0, Math.min(255, v + amt));
+  return '#' + [c(n >> 16), c((n >> 8) & 255), c(n & 255)].map(v => v.toString(16).padStart(2, '0')).join('');
+}
+
+let _uid = 0;
+function drawPot() { return drawShape(sel.shapeKey, sel.glaze.color, sel.pattern.key, sel.subCategory, sel.category); }
+function drawShape(shapeKey, col, patKey, sub, cat) {
+  const u = 'u' + (++_uid);
+  const dark = shade(col, -45), darker = shade(col, -80);
+  let body = '', extra = '';
+  const k = sub === '접시' ? 'dish' : sub === '자석장식' ? 'magnet' : shapeKey;
+  switch (k) {
+    case 'cylinder': body = 'M55 50 L55 175 Q110 195 165 175 L165 50 Z'; extra = `<ellipse cx="110" cy="50" rx="55" ry="12" fill="${col}" stroke="${darker}" stroke-width="2"/><ellipse cx="110" cy="52" rx="47" ry="8" fill="${dark}"/>`; break;
+    case 'sphere':   body = 'M80 45 Q30 60 32 120 Q38 190 110 192 Q182 190 188 120 Q190 60 140 45 Z'; extra = `<ellipse cx="110" cy="45" rx="30" ry="8" fill="${dark}" stroke="${darker}" stroke-width="2"/>`; break;
+    case 'bowl':     body = 'M25 80 Q35 185 110 185 Q185 185 195 80 Z'; extra = `<ellipse cx="110" cy="80" rx="85" ry="18" fill="${col}" stroke="${darker}" stroke-width="2"/><ellipse cx="110" cy="82" rx="75" ry="12" fill="${dark}"/>`; break;
+    case 'box':      body = 'M45 70 L145 70 L145 185 L45 185 Z'; extra = `<path d="M145 70 L180 50 L180 165 L145 185 Z" fill="${dark}" stroke="${darker}" stroke-width="2"/><path d="M45 70 L80 50 L180 50 L145 70 Z" fill="${darker}" stroke="${darker}" stroke-width="2"/>`; break;
+    case 'dish':     body = 'M15 110 Q20 160 110 165 Q200 160 205 110 Z'; extra = `<ellipse cx="110" cy="110" rx="95" ry="38" fill="${col}" stroke="${darker}" stroke-width="2"/><ellipse cx="110" cy="112" rx="75" ry="27" fill="${shade(col,-20)}"/>`; break;
+    case 'magnet':   body = 'M110 50 A60 60 0 1 1 109.9 50 Z'; break;
+    case 'flat':     body = 'M40 40 L180 40 L180 180 L40 180 Z'; break;
+    default:         body = 'M60 70 Q40 30 95 40 Q130 15 160 50 Q200 80 175 130 Q190 185 120 185 Q50 195 45 140 Q20 105 60 70 Z';
+  }
+  const ink = 'rgba(60,40,20,.35)';
+  const defs = `
+    <pattern id="${u}-dots" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="9" cy="9" r="3" fill="${ink}"/></pattern>
+    <pattern id="${u}-stripes" width="220" height="16" patternUnits="userSpaceOnUse"><rect y="6" width="220" height="3" fill="${ink}"/></pattern>
+    <pattern id="${u}-waves" width="40" height="22" patternUnits="userSpaceOnUse"><path d="M0 11 Q10 2 20 11 T40 11" fill="none" stroke="${ink}" stroke-width="3"/></pattern>
+    <pattern id="${u}-flowers" width="44" height="44" patternUnits="userSpaceOnUse"><g fill="${ink}"><circle cx="22" cy="14" r="5"/><circle cx="30" cy="22" r="5"/><circle cx="22" cy="30" r="5"/><circle cx="14" cy="22" r="5"/></g><circle cx="22" cy="22" r="4" fill="rgba(255,240,180,.9)"/></pattern>
+    <pattern id="${u}-leaves" width="46" height="46" patternUnits="userSpaceOnUse"><path d="M10 36 Q12 12 36 10 Q34 34 10 36 Z" fill="none" stroke="${ink}" stroke-width="2.5"/><path d="M10 36 L30 16" stroke="${ink}" stroke-width="2"/></pattern>
+    <clipPath id="${u}-clip"><path d="${body}"/></clipPath>
+    <linearGradient id="${u}-shine" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".15"/></linearGradient>`;
+  const pat = patKey && patKey !== 'none' ? `<rect x="0" y="0" width="220" height="220" fill="url(#${u}-${patKey})" clip-path="url(#${u}-clip)"/>` : '';
+  const handle = sub === '컵' && k !== 'flat' ? `<path d="M165 80 Q205 85 200 120 Q195 150 165 150" fill="none" stroke="${darker}" stroke-width="14" stroke-linecap="round"/><path d="M165 80 Q205 85 200 120 Q195 150 165 150" fill="none" stroke="${col}" stroke-width="9" stroke-linecap="round"/>` : '';
+  const candle = sub === '촛대' ? `<rect x="100" y="0" width="20" height="48" rx="3" fill="#fffdf5" stroke="#d8cbb0"/><path d="M110 -12 Q118 -2 110 4 Q102 -2 110 -12 Z" fill="#f6a623"/>` : '';
+  const plant = cat === '화분' ? `<path d="M110 50 Q90 10 70 20 M110 50 Q115 5 140 10 M110 50 Q130 25 160 30" stroke="#4d8b4a" stroke-width="6" fill="none" stroke-linecap="round"/>` : '';
+  return `<svg viewBox="-10 -20 240 240" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+    <defs>${defs}</defs>
+    <ellipse cx="110" cy="200" rx="80" ry="10" fill="rgba(0,0,0,.08)"/>
+    ${handle}${plant}
+    <path d="${body}" fill="${col}" stroke="${darker}" stroke-width="2"/>
+    ${pat}
+    <path d="${body}" fill="url(#${u}-shine)"/>
+    ${extra}${candle}
+  </svg>`;
+}
+
+// ===================== 만드는 방법 결정 =====================
+function getMethod() {
+  const s = sel.subCategory;
+  if (['타일', '자석장식'].includes(s)) return 'flat';
+  if (s === '접시') return 'mold';
+  if (sel.shapeKey === 'bowl' && ['냉면기', '국그릇', '대형 화분'].includes(s)) return 'mold';
+  return { cylinder:'coil', sphere:'sphere', bowl:'pinch', box:'slab', free:'free' }[sel.shapeKey];
+}
+
+// ===================== 단계별 예시 그림 =====================
+const CL = '#c9a27e', CLD = '#9b7350', INK = '#5a4632', ORG = '#e0662f', SKIN = '#f1c9a5', WOOD = '#c8945f', WOODD = '#8a5d33';
+const ARDEF = `<defs><marker id="ah" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${ORG}"/></marker></defs>`;
+const sv = inner => `<svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" class="w-full h-full" font-family="Jua, Malgun Gothic, sans-serif">${ARDEF}${inner}</svg>`;
+const ar = (x1, y1, x2, y2) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${ORG}" stroke-width="4" stroke-linecap="round" marker-end="url(#ah)"/>`;
+const cr = d => `<path d="${d}" fill="none" stroke="${ORG}" stroke-width="4" stroke-linecap="round" marker-end="url(#ah)"/>`;
+const tx = (x, y, t, s = 15, c = INK) => `<text x="${x}" y="${y}" font-size="${s}" fill="${c}" text-anchor="middle" font-weight="bold">${t}</text>`;
+const disc = (cx, cy, rx, ry, h = 8, c = CL) => `<path d="M${cx-rx} ${cy} L${cx-rx} ${cy+h} A${rx} ${ry} 0 0 0 ${cx+rx} ${cy+h} L${cx+rx} ${cy} Z" fill="${CLD}"/><ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${c}" stroke="${CLD}" stroke-width="1.5"/>`;
+const bowl = (cx, by, w, h, c = CL) => `<path d="M${cx-w} ${by-h} Q${cx-w+4} ${by} ${cx} ${by} Q${cx+w-4} ${by} ${cx+w} ${by-h} Z" fill="${c}" stroke="${shade(c,-60)}" stroke-width="2"/><ellipse cx="${cx}" cy="${by-h}" rx="${w}" ry="${h*0.2}" fill="${shade(c,-40)}" stroke="${shade(c,-60)}" stroke-width="2"/>`;
+const cyl = (cx, by, w, h, c = CL) => `<path d="M${cx-w} ${by-h} L${cx-w} ${by} A${w} ${w*0.25} 0 0 0 ${cx+w} ${by} L${cx+w} ${by-h} Z" fill="${c}" stroke="${shade(c,-60)}" stroke-width="2"/><ellipse cx="${cx}" cy="${by-h}" rx="${w}" ry="${w*0.25}" fill="${shade(c,-40)}" stroke="${shade(c,-60)}" stroke-width="2"/>`;
+const thumb = (x, y) => `<g transform="translate(${x} ${y})"><rect x="-12" y="-52" width="24" height="56" rx="12" fill="${SKIN}" stroke="#d9a47e" stroke-width="2"/><ellipse cx="0" cy="-4" rx="8" ry="5" fill="#fbe3d0"/></g>`;
+const dome = (c = '#b9c7d3') => `<line x1="20" y1="122" x2="180" y2="122" stroke="#bbb" stroke-width="3"/><path d="M45 122 Q45 55 100 55 Q155 55 155 122 Z" fill="${c}" stroke="${shade(c,-50)}" stroke-width="2"/>`;
+const kiln = t => sv(`<rect x="45" y="25" width="110" height="105" rx="10" fill="#9aa3ab" stroke="#6b737a" stroke-width="3"/><rect x="62" y="42" width="76" height="70" rx="6" fill="#3b3b3b"/><path d="M72 112 Q70 90 84 78 Q83 95 95 100 Q92 78 105 65 Q109 88 118 92 Q123 80 128 112 Z" fill="${ORG}"/><path d="M86 112 Q89 97 100 90 Q110 99 114 112 Z" fill="#f6c343"/>${tx(100,18,t,17,'#c0392b')}${tx(100,147,'뜨거워요! 만지지 않기',13,'#c0392b')}`);
+
+const PICS = {
+  tools: () => sv(`<rect x="20" y="30" width="115" height="14" rx="7" fill="${WOOD}" stroke="${WOODD}" stroke-width="2"/><rect x="6" y="34" width="17" height="6" rx="3" fill="${WOODD}"/><rect x="132" y="34" width="17" height="6" rx="3" fill="${WOODD}"/>${tx(78,22,'밀대',13)}
+    <line x1="168" y1="22" x2="178" y2="110" stroke="#d8b98a" stroke-width="4" stroke-linecap="round"/>${tx(176,130,'이쑤시개',11)}
+    <rect x="12" y="75" width="45" height="40" rx="6" fill="${CL}" stroke="${CLD}" stroke-width="2"/>${tx(34,135,'흙',13)}
+    <rect x="66" y="90" width="36" height="25" rx="5" fill="#f5d547" stroke="#c9a92a" stroke-width="2"/><circle cx="76" cy="100" r="2.5" fill="#c9a92a"/><circle cx="90" cy="107" r="2.5" fill="#c9a92a"/>${tx(84,135,'스펀지',13)}
+    <path d="M110 70 L118 115 L142 115 L150 70 Z" fill="#cfe8f7" stroke="#7fb3d5" stroke-width="2"/><path d="M113 86 L118 115 L142 115 L147 86 Z" fill="#9fd0ef"/>${tx(130,135,'물통',13)}`),
+  knead: () => sv(`${disc(100,92,62,22,14)}${ar(70,12,76,58)}${ar(130,12,124,58)}${tx(100,142,'접고 → 꾹 누르기 (10번)')}`),
+  pinch1: () => sv(`<circle cx="100" cy="92" r="45" fill="${CL}" stroke="${CLD}" stroke-width="2"/><ellipse cx="100" cy="64" rx="15" ry="7" fill="${CLD}"/>${thumb(100,68)}<line x1="70" y1="130" x2="130" y2="130" stroke="${ORG}" stroke-width="2" stroke-dasharray="4 3"/>${tx(100,148,'바닥은 1cm 남겨요',13)}`),
+  pinch2: () => sv(`<path d="M35 40 Q38 122 100 122 Q162 122 165 40" fill="none" stroke="${CL}" stroke-width="16" stroke-linecap="round"/>${ar(78,85,46,74)}${ar(122,85,154,74)}${cr('M70 140 Q100 150 132 139')}${tx(100,22,'살짝 누르고 → 돌리기')}`),
+  measure: () => sv(`${bowl(100,128,65,55)}<rect x="30" y="34" width="140" height="16" fill="#f3d36b" stroke="#c9a92a" stroke-width="2"/>${[...Array(15)].map((_, i) => `<line x1="${35+i*9.3}" y1="34" x2="${35+i*9.3}" y2="${i%5?41:47}" stroke="${INK}" stroke-width="1.5"/>`).join('')}${tx(100,22,'자로 크기를 재요')}`),
+  coilBase: () => sv(`${disc(100,80,72,25,10)}${tx(100,140,'두께 1cm 동그란 바닥')}`),
+  coilRoll: () => sv(`${tx(100,40,'손가락 굵기로 길게',14)}<rect x="25" y="62" width="150" height="22" rx="11" fill="${CL}" stroke="${CLD}" stroke-width="2"/>${ar(85,108,35,108)}${ar(115,108,165,108)}${tx(100,140,'손바닥으로 앞뒤로 굴려요')}`),
+  score: () => sv(`${disc(90,95,65,22,10)}${[45,70,95,120].map(x => `<path d="M${x} 104 l10 10 M${x+10} 104 l-10 10" stroke="${INK}" stroke-width="2"/>`).join('')}<line x1="168" y1="40" x2="140" y2="95" stroke="${WOODD}" stroke-width="6" stroke-linecap="round"/><path d="M140 95 l-7 14 l13 -2 z" fill="#ddd" stroke="#999"/><ellipse cx="90" cy="60" rx="55" ry="16" fill="none" stroke="${CL}" stroke-width="10"/>${tx(100,22,'#긁기 → 흙물 → 흙가래 올리기',12)}`),
+  coilSmooth: () => sv(`${[0,1,2,3,4].map(i => `<circle cx="68" cy="${118-i*18}" r="10" fill="${CL}" stroke="${CLD}" stroke-width="1.5"/><circle cx="132" cy="${118-i*18}" r="10" fill="${CL}" stroke="${CLD}" stroke-width="1.5"/>`).join('')}<rect x="58" y="126" width="84" height="10" fill="${CL}" stroke="${CLD}" stroke-width="1.5"/>${ar(95,42,80,110)}${ar(105,42,120,110)}${tx(100,20,'안쪽을 아래로 쓸어 내려요',13)}`),
+  slabRoll: () => sv(`<rect x="15" y="52" width="150" height="10" fill="${WOODD}"/><rect x="15" y="118" width="150" height="10" fill="${WOODD}"/>${tx(185,60,'막대',11)}<rect x="28" y="66" width="124" height="48" rx="4" fill="${CL}" stroke="${CLD}" stroke-width="2"/><rect x="80" y="36" width="22" height="110" rx="11" fill="${WOOD}" stroke="${WOODD}" stroke-width="2"/>${ar(76,90,40,90)}${ar(106,90,145,90)}${tx(100,22,'막대 위로 밀대를 굴려요',13)}`),
+  slabCut: () => { const s = 32, cx = 84, cy = 57; const r = (x, y, c, t) => `<rect x="${x}" y="${y}" width="${s}" height="${s}" fill="${c}" stroke="${CLD}" stroke-width="2"/>${t ? tx(x+s/2, y+s/2+5, t, 11, '#fff') : ''}`;
+    return sv(`${r(cx,cy,CLD,'바닥')}${r(cx,cy-35,CL,'벽')}${r(cx,cy+35,CL,'벽')}${r(cx-35,cy,CL,'벽')}${r(cx+35,cy,CL,'벽')}${tx(100,146,'바닥 1장 + 벽 4장',13)}`); },
+  wait: () => sv(`<circle cx="100" cy="68" r="48" fill="#fff" stroke="${INK}" stroke-width="4"/>${[...Array(12)].map((_, i) => { const a = i * Math.PI / 6; return `<line x1="${100+40*Math.sin(a)}" y1="${68-40*Math.cos(a)}" x2="${100+46*Math.sin(a)}" y2="${68-46*Math.cos(a)}" stroke="${INK}" stroke-width="2"/>`; }).join('')}<line x1="100" y1="68" x2="100" y2="34" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><line x1="100" y1="68" x2="124" y2="80" stroke="${ORG}" stroke-width="4" stroke-linecap="round"/>${tx(100,140,'30분 ~ 1시간 기다려요',14)}`),
+  slabBuild: () => sv(`<path d="M40 110 L120 110 L160 88 L80 88 Z" fill="${CLD}" stroke="${INK}" stroke-width="1.5"/><path d="M80 88 L80 40 L160 40 L160 88 Z" fill="${CL}" stroke="${CLD}" stroke-width="2"/><path d="M40 110 L40 62 L80 40 L80 88 Z" fill="${shade(CL,-20)}" stroke="${CLD}" stroke-width="2"/><path d="M40 114 L120 114 L108 142 L28 142 Z" fill="${CL}" stroke="${CLD}" stroke-width="2" opacity=".85"/>${cr('M140 135 Q170 110 140 82')}${tx(100,24,'긁고 → 흙물 → 세워 붙이기',13)}`),
+  sphere2: () => sv(`<circle cx="58" cy="75" r="38" fill="${CL}" stroke="${CLD}" stroke-width="2"/><circle cx="142" cy="75" r="38" fill="${CL}" stroke="${CLD}" stroke-width="2"/>${tx(100,84,'=',30,ORG)}${tx(100,140,'똑같은 크기로 2개')}`),
+  sphereHalves: () => sv(`${bowl(55,118,40,48)}${bowl(145,118,40,48)}${ar(92,60,108,60)}${ar(108,60,92,60)}${tx(100,24,'입구 크기를 똑같이 맞춰요',13)}`),
+  sphereJoin: () => sv(`<circle cx="100" cy="78" r="50" fill="${CL}" stroke="${CLD}" stroke-width="2"/><path d="M50 78 Q100 96 150 78" stroke="${INK}" stroke-width="2.5" stroke-dasharray="6 4" fill="none"/>${ar(100,4,100,22)}${ar(100,150,100,134)}${tx(176,84,'꾹!',18,ORG)}${tx(28,84,'꾹!',18,ORG)}`),
+  sphereHole: () => sv(`<circle cx="100" cy="88" r="50" fill="${CL}" stroke="${CLD}" stroke-width="2"/><ellipse cx="100" cy="47" rx="22" ry="7" fill="${INK}"/>${ar(160,18,127,42)}${tx(100,147,'꼭 구멍을 내요!',14,'#c0392b')}`),
+  flatCut: () => sv(`<path d="M25 120 L148 120 L175 62 L52 62 Z" fill="${CL}" stroke="${CLD}" stroke-width="2"/><path d="M58 110 L130 110 L148 72 L76 72 Z" fill="none" stroke="${INK}" stroke-width="2.5" stroke-dasharray="6 4"/><line x1="160" y1="18" x2="140" y2="70" stroke="#9aa3ab" stroke-width="7" stroke-linecap="round"/>${tx(100,145,'점선(종이 본)을 따라 잘라요',13)}`),
+  flatPress: () => sv(`<rect x="20" y="38" width="120" height="13" fill="${WOOD}" stroke="${WOODD}"/><rect x="20" y="54" width="120" height="6" fill="#ddd"/><rect x="26" y="63" width="108" height="15" fill="${CL}" stroke="${CLD}"/><rect x="20" y="81" width="120" height="6" fill="#ddd"/><rect x="20" y="90" width="120" height="13" fill="${WOOD}" stroke="${WOODD}"/>${tx(168,49,'판',12)}${tx(168,61,'신문지',11)}${tx(168,76,'흙판',12)}${tx(168,89,'신문지',11)}${tx(168,102,'판',12)}${ar(80,8,80,32)}${tx(100,135,'휘지 않게 눌러 두어요',13)}`),
+  moldPrep: () => sv(`${dome()}<path d="M38 124 Q38 47 100 47 Q162 47 162 124" fill="none" stroke="#999" stroke-width="4" stroke-dasharray="7 4"/>${tx(100,145,'그릇 엎고 → 신문지 씌우기',13)}${tx(100,30,'신문지',12,'#777')}`),
+  moldCover: () => sv(`${dome()}<path d="M32 124 Q32 40 100 40 Q168 40 168 124" fill="none" stroke="${CL}" stroke-width="13"/>${ar(52,6,60,32)}${ar(148,6,140,32)}${tx(100,145,'흙판을 덮고 살살 눌러요',13)}`),
+  foot: () => sv(`${dome(CL)}<ellipse cx="100" cy="55" rx="28" ry="8" fill="none" stroke="${CLD}" stroke-width="7"/>${ar(160,18,130,46)}${tx(100,145,'굽(받침) 고리를 붙여요',13)}`),
+  unmold: () => sv(`<line x1="20" y1="142" x2="180" y2="142" stroke="#bbb" stroke-width="3"/><path d="M60 142 Q60 108 100 108 Q140 108 140 142 Z" fill="#b9c7d3" stroke="#7d8a96" stroke-width="2"/>${bowl(100,92,55,52)}${ar(175,110,175,45)}${tx(100,16,'뒤집어서 살살 빼요',13)}`),
+  freeDraw: () => sv(`<rect x="25" y="20" width="120" height="110" fill="#fff" stroke="#ccc" stroke-width="2"/><ellipse cx="80" cy="85" rx="35" ry="22" fill="none" stroke="${INK}" stroke-width="2.5"/><circle cx="122" cy="68" r="14" fill="none" stroke="${INK}" stroke-width="2.5"/><path d="M58 104 l-4 14 M100 104 l4 14" stroke="${INK}" stroke-width="2.5"/><rect x="150" y="30" width="12" height="80" rx="2" fill="#f3d36b" stroke="#c9a92a" transform="rotate(20 156 70)"/>${tx(85,145,'먼저 그려 봐요',13)}`),
+  freeBody: () => sv(`<ellipse cx="100" cy="90" rx="65" ry="40" fill="${CL}" stroke="${CLD}" stroke-width="2"/>${tx(100,28,'가장 큰 몸통부터 만들어요',13)}`),
+  freeParts: () => sv(`<ellipse cx="85" cy="95" rx="55" ry="32" fill="${CL}" stroke="${CLD}" stroke-width="2"/><circle cx="165" cy="55" r="20" fill="${CL}" stroke="${CLD}" stroke-width="2"/><circle cx="170" cy="50" r="3" fill="${INK}"/>${ar(150,72,135,82)}<rect x="55" y="120" width="12" height="18" rx="5" fill="${CL}" stroke="${CLD}"/><rect x="100" y="120" width="12" height="18" rx="5" fill="${CL}" stroke="${CLD}"/>${tx(80,24,'긁고 → 흙물 → 붙이기',13)}`),
+  freeHollow: () => sv(`<ellipse cx="95" cy="80" rx="68" ry="45" fill="${CL}" stroke="${CLD}" stroke-width="2"/><ellipse cx="95" cy="85" rx="45" ry="26" fill="#fff6ec" stroke="${CLD}" stroke-width="2" stroke-dasharray="5 4"/><line x1="185" y1="20" x2="135" y2="78" stroke="#9aa3ab" stroke-width="6" stroke-linecap="round"/><ellipse cx="130" cy="84" rx="9" ry="6" fill="#9aa3ab"/>${tx(95,145,'속을 파서 얇게 해요',13)}`),
+  handle: () => sv(`${cyl(85,118,40,80)}<path d="M125 55 Q168 55 162 82 Q157 108 125 104" fill="none" stroke="${CL}" stroke-width="12" stroke-linecap="round"/><path d="M125 55 Q168 55 162 82 Q157 108 125 104" fill="none" stroke="${CLD}" stroke-width="1.5"/>${ar(185,30,165,52)}${tx(85,145,'C자 손잡이를 붙여요',13)}`),
+  drain: () => sv(`<ellipse cx="95" cy="78" rx="70" ry="45" fill="${CL}" stroke="${CLD}" stroke-width="2"/><circle cx="95" cy="78" r="10" fill="${INK}"/><rect x="140" y="10" width="12" height="75" rx="4" fill="#f2b5c4" stroke="#c97a8f" transform="rotate(35 146 47)"/>${tx(95,145,'바닥 가운데에 구멍!',13)}`),
+  candle: () => sv(`${cyl(95,128,52,38)}<rect x="83" y="28" width="24" height="68" rx="3" fill="#fffdf5" stroke="#d8cbb0" stroke-width="2"/><path d="M95 8 Q104 20 95 27 Q86 20 95 8 Z" fill="#f6a623"/>${ar(150,30,150,80)}${tx(165,105,'꾹',16,ORG)}`),
+  neck: () => sv(`<path d="M70 52 Q30 70 35 100 Q40 135 100 135 Q160 135 165 100 Q170 70 130 52 Z" fill="${CL}" stroke="${CLD}" stroke-width="2"/><ellipse cx="100" cy="48" rx="31" ry="8" fill="none" stroke="${shade(CL,15)}" stroke-width="10"/><ellipse cx="100" cy="48" rx="31" ry="8" fill="none" stroke="${CLD}" stroke-width="1.5"/>${ar(60,30,72,42)}${tx(100,20,'입구 위에 흙가래 한 줄',13)}`),
+  smooth: () => sv(`${bowl(85,128,62,58)}<rect x="135" y="30" width="40" height="28" rx="6" fill="#f5d547" stroke="#c9a92a" stroke-width="2" transform="rotate(-20 155 44)"/>${cr('M140 72 Q165 92 138 115')}${tx(85,148,'물은 조금만!',13)}`),
+  name: () => sv(`<ellipse cx="100" cy="72" rx="78" ry="46" fill="${CL}" stroke="${CLD}" stroke-width="2"/><ellipse cx="100" cy="72" rx="55" ry="30" fill="none" stroke="${CLD}" stroke-width="3"/>${tx(100,80,'내 이름',22,INK)}<line x1="175" y1="10" x2="140" y2="68" stroke="#d8b98a" stroke-width="4" stroke-linecap="round"/>${tx(100,142,'바닥에 이쑤시개로 써요',13)}`),
+  dry: () => sv(`${cyl(95,118,38,62)}<path d="M45 132 Q38 30 95 26 Q152 30 145 132" fill="rgba(160,205,235,.25)" stroke="#7fb3d5" stroke-width="2.5" stroke-dasharray="6 4"/><circle cx="175" cy="28" r="14" fill="#f6c343"/><path d="M162 15 L188 41 M188 15 L162 41" stroke="#c0392b" stroke-width="4"/>${tx(95,147,'그늘에서 1~2주 말려요',13)}`),
+  kiln1: () => kiln('약 800℃'),
+  kiln2: () => kiln('약 1250℃'),
+  glaze: () => { const g = sel.glaze.color; return sv(`${cyl(80,112,40,70,g)}<line x1="170" y1="15" x2="132" y2="68" stroke="${WOODD}" stroke-width="7" stroke-linecap="round"/><path d="M132 68 l-8 14 l14 -3 z" fill="${g}" stroke="${CLD}"/>${cr('M140 92 Q150 72 140 52')}${tx(100,145,'바닥은 깨끗이 닦아요',13,'#c0392b')}`); },
+  done: () => drawPot()
+};
+
+const PIC_MAP = {
+  '준비물을 챙겨요':'tools', '흙을 반죽해요':'knead', '엄지로 구멍을 내요':'pinch1', '돌리면서 살살 눌러요':'pinch2', '크기를 재요':'measure',
+  '바닥을 만들어요':'coilBase', '흙가래를 만들어요':'coilRoll', '긁고, 바르고, 붙여요':'score', '안쪽을 이어 붙여요':'coilSmooth',
+  '흙판을 밀어요':'slabRoll', '5조각으로 잘라요':'slabCut', '조금 굳혀요':'wait', '벽을 세워 붙여요':'slabBuild',
+  '공을 2개 만들어요':'sphere2', '반쪽 그릇 2개를 만들어요':'sphereHalves', '두 개를 붙여 공을 만들어요':'sphereJoin', '구멍(입구)을 내요':'sphereHole',
+  '모양대로 잘라요':'flatCut', '휘지 않게 해요':'flatPress', '틀을 준비해요':'moldPrep', '흙판을 덮어요':'moldCover', '굽(받침)을 붙여요':'foot', '틀에서 빼요':'unmold',
+  '그림으로 먼저 그려요':'freeDraw', '큰 몸통을 만들어요':'freeBody', '작은 부분을 붙여요':'freeParts', '두꺼운 곳은 속을 파요':'freeHollow',
+  '손잡이를 붙여요':'handle', '물 빠지는 구멍을 뚫어요':'drain', '초 꽂을 자리를 만들어요':'candle', '항아리 목을 만들어요':'neck',
+  '매끈하게 다듬어요':'smooth', '점 무늬를 찍어요':'p:dots', '줄 무늬를 그어요':'p:stripes', '물결 무늬를 그려요':'p:waves', '꽃 무늬를 붙여요':'p:flowers', '나뭇잎을 찍어요':'p:leaves',
+  '바닥에 이름을 써요':'name', '천천히 말려요':'dry', '처음 굽기 (초벌구이)':'kiln1', '두 번째 굽기 (재벌구이)':'kiln2', '완성!':'done'
+};
+
+function picFor(st) {
+  const k = PIC_MAP[st.title] || (st.title.endsWith('유약을 발라요') ? 'glaze' : null);
+  if (!k) return `<div class="text-8xl">${st.icon}</div>`;
+  if (k.startsWith('p:')) return drawShape(sel.shapeKey, CL, k.slice(2), sel.subCategory, sel.category);
+  return PICS[k]();
+}
+
+// ===================== 단계별 가이드 만들기 =====================
+function buildGuide() {
+  const s = sel.subCategory, m = sel.method, steps = [];
+  const thick = s === '자석장식' ? '0.7cm' : '1cm';
+
+  // 1. 준비물
+  const tools = ['🟤 점토 ' + sel.clay, '💧 물통과 스펀지', '🪵 작업판 (나무판)', '🦷 이쑤시개 또는 꼬챙이', '🥛 흙물 (흙 + 물 섞은 것)', '🖌️ 붓'];
+  if (['coil','slab','flat','mold'].includes(m)) tools.push('🥖 밀대', '🔪 플라스틱 칼', '📄 종이 본 (모양 그린 종이)');
+  if (m === 'slab' || m === 'flat' || m === 'mold') tools.push('📏 두께 막대 2개 (' + thick + ')');
+  if (m === 'mold') tools.push('🥣 엎을 그릇 (틀) + 신문지');
+  if (sel.category === '화분') tools.push('🥤 빨대 (구멍 뚫기용)');
+  if (sel.pattern.key === 'leaves') tools.push('🍃 진짜 나뭇잎');
+  if (sel.pattern.key === 'dots') tools.push('✏️ 연필 뒤꼭지 또는 면봉');
+  if (sel.pattern.key === 'waves') tools.push('🍴 포크');
+  steps.push({ icon:'🧰', title:'준비물을 챙겨요', lines:['앞치마를 입고 손을 씻어요.', '아래 준비물을 책상 위에 놓아요.', ...tools.map(t => '• ' + t)], tip:'준비물을 하나씩 손가락으로 짚으며 확인해 보세요.' });
+
+  // 2. 흙 준비
+  steps.push({ icon:'🟤', title:'흙을 반죽해요', lines:[`흙을 ${sel.clay}만큼 떼어요.`, '책상 위에서 두 손으로 꾹꾹 눌러요.', '접고, 누르고, 또 접고 눌러요. (10번)', '동그란 공 모양으로 만들어요.'], tip:'반죽하면 흙 속의 공기가 빠져요.', caution:'공기가 남아 있으면 구울 때 터질 수 있어요!' });
+
+  // 3. 모양 만들기 (방법별)
+  const M = {
+    pinch: [
+      { icon:'👍', title:'엄지로 구멍을 내요', lines:['흙 공을 한 손에 올려요.', '다른 손 엄지를 공 가운데에 꾹 넣어요.', '바닥까지 뚫지 말고 1cm는 남겨요.'], tip:'바닥 두께가 새끼손가락 굵기(약 1cm)쯤 남으면 좋아요.' },
+      { icon:'🤏', title:'돌리면서 살살 눌러요', lines:['엄지는 안쪽, 다른 손가락은 바깥쪽에 대요.', '살짝 누르고 → 조금 돌리고 → 또 눌러요.', '아래에서 위로 천천히 올라가요.', '벽 두께가 0.7cm쯤 되게 해요.'], caution:'너무 세게 누르면 벽이 찢어져요. 살살!' },
+      { icon:'📏', title:'크기를 재요', lines:[`목표 크기: ${sel.desc}`, '자로 지름과 높이를 재어 봐요.', '작으면 조금 더 눌러 넓혀요.', '책상에 톡톡 쳐서 바닥을 평평하게 해요.'], tip:'갈라진 곳이 생기면 물 묻힌 손가락으로 문질러요.' }
+    ],
+    coil: [
+      { icon:'⚪', title:'바닥을 만들어요', lines:['흙 조금을 밀대로 1cm 두께로 밀어요.', `종이 본을 대고 동그랗게 잘라요. (${sel.desc.split(',')[0].trim()})`, '이것이 바닥이에요.'] },
+      { icon:'🐍', title:'흙가래를 만들어요', lines:['흙을 조금 떼어요.', '책상 위에서 손바닥으로 앞뒤로 굴려요.', '손가락 굵기로 길게 만들어요.', '5~8개를 만들어요.'], tip:'손가락 말고 손바닥 전체로 굴려야 고르게 돼요.', caution:'흙가래가 마르지 않게 비닐로 덮어 두세요.' },
+      { icon:'#️⃣', title:'긁고, 바르고, 붙여요', lines:['바닥 가장자리를 이쑤시개로 #모양 긁어요.', '긁은 곳에 붓으로 흙물을 발라요.', '흙가래를 가장자리를 따라 동그랗게 올려요.', '한 줄씩 위로 쌓아 올려요.'], tip:'"긁고 → 바르고 → 붙이기" 세 가지를 꼭 기억해요!' },
+      { icon:'👆', title:'안쪽을 이어 붙여요', lines:['안쪽은 손가락으로 위 흙가래를 아래로 쓸어 내려요.', '줄과 줄 사이 틈이 없어지게 해요.', '바깥쪽은 매끈하게 하거나 그대로 두어도 예뻐요.', `${(sel.desc.split(',')[1] || '').trim() ? '높이가 ' + sel.desc.split(',')[1].trim().replace(/^높이 /, '') : '원하는 높이가'} 될 때까지 쌓아요.`] }
+    ],
+    slab: [
+      { icon:'🥖', title:'흙판을 밀어요', lines:['흙 양옆에 두께 막대 2개를 놓아요.', '밀대를 막대 위로 굴려 흙을 밀어요.', '두께 1cm의 고른 흙판이 돼요.'], tip:'한 방향으로 밀고, 흙을 돌려서 또 밀어요.' },
+      { icon:'✂️', title:'5조각으로 잘라요', lines:['종이 본을 흙판 위에 올려요.', '플라스틱 칼로 본을 따라 잘라요.', '바닥 1장 + 벽 4장 = 모두 5장!'], caution:'칼은 천천히, 손가락은 칼 반대쪽에 두어요.' },
+      { icon:'⏳', title:'조금 굳혀요', lines:['자른 흙판을 30분~1시간 그대로 둬요.', '손으로 들어도 휘지 않으면 준비 끝!'], tip:'너무 말랑하면 벽이 쓰러져요.' },
+      { icon:'🧱', title:'벽을 세워 붙여요', lines:['붙일 곳을 이쑤시개로 #모양 긁어요.', '흙물을 발라요.', '바닥 위에 벽을 한 장씩 세워 꾹 눌러요.', '안쪽 모서리에 얇은 흙가래를 넣고 손가락으로 눌러 튼튼하게 해요.'], tip:'"긁고 → 바르고 → 붙이기"를 꼭 지켜요!' }
+    ],
+    sphere: [
+      { icon:'⚪⚪', title:'공을 2개 만들어요', lines:['흙을 똑같은 크기로 2개 나눠요.', '각각 동그란 공으로 만들어요.'] },
+      { icon:'🤏', title:'반쪽 그릇 2개를 만들어요', lines:['엄지를 공 가운데에 꾹 넣어요.', '돌리면서 살살 눌러 그릇 모양을 만들어요.', '두 그릇의 입구 크기를 똑같이 맞춰요.'], tip:'두 그릇 입구를 대 보면서 크기를 맞춰요.' },
+      { icon:'🔗', title:'두 개를 붙여 공을 만들어요', lines:['두 그릇의 입구를 이쑤시개로 긁어요.', '흙물을 발라요.', '입구끼리 맞대어 꾹 눌러 붙여요.', '이음매를 손가락으로 문질러 없애요.'] },
+      { icon:'🕳️', title:'구멍(입구)을 내요', lines:['윗부분을 칼로 동그랗게 잘라 입구를 만들어요.', '입구 가장자리를 스펀지로 매끈하게 해요.'], caution:'속이 막힌 채로 구우면 터져요! 꼭 구멍을 내요.' }
+    ],
+    flat: [
+      { icon:'🥖', title:'흙판을 밀어요', lines:['흙 양옆에 두께 막대를 놓아요.', `밀대로 밀어 ${thick} 두께로 만들어요.`] },
+      { icon:'✂️', title:'모양대로 잘라요', lines:['종이 본을 흙판 위에 올려요.', `칼로 본을 따라 잘라요. (${sel.desc})`, '가장자리를 물 묻힌 스펀지로 매끈하게 해요.'], caution:'칼은 천천히, 손가락은 칼 반대쪽에!' },
+      { icon:'🔁', title:'휘지 않게 해요', lines:['흙판 위아래를 신문지로 덮어요.', '그 위에 얇은 판을 올려 두어요.'], tip:'납작한 작품은 빨리 마르면 휘어져요.' }
+    ],
+    mold: [
+      { icon:'🥖', title:'흙판을 밀어요', lines:['흙 양옆에 두께 막대(1cm)를 놓아요.', '밀대로 밀어 크고 둥근 흙판을 만들어요.'] },
+      { icon:'🥣', title:'틀을 준비해요', lines:['그릇을 거꾸로 엎어 놓아요.', '그 위에 신문지(또는 비닐)를 씌워요.'], tip:'신문지가 있어야 나중에 잘 떨어져요.' },
+      { icon:'🤲', title:'흙판을 덮어요', lines:['흙판을 들어 틀 위에 살짝 올려요.', '손바닥으로 위에서 아래로 살살 눌러 모양을 잡아요.', '남는 가장자리는 칼로 잘라 정리해요.'] },
+      { icon:'⭕', title:'굽(받침)을 붙여요', lines:['얇은 흙가래로 동그란 고리를 만들어요.', '그릇 바닥(지금은 위쪽)을 긁고 흙물을 발라요.', '고리를 붙여요. 이것이 굽이에요.'] },
+      { icon:'⏳', title:'틀에서 빼요', lines:['1~2시간 기다려 조금 굳혀요.', '틀째로 뒤집어 살살 빼요.', `크기를 재어 봐요. (${sel.desc})`], caution:'너무 오래 두면 흙이 줄어들며 갈라져요.' }
+    ],
+    free: [
+      { icon:'✏️', title:'그림으로 먼저 그려요', lines:['만들고 싶은 모양을 종이에 그려요.', '몸통, 머리, 다리처럼 부분을 나눠 봐요.'], tip:'미리보기 화면을 보면서 그려도 좋아요.' },
+      { icon:'🤲', title:'큰 몸통을 만들어요', lines:['흙 덩어리로 가장 큰 부분(몸통)을 만들어요.', '손으로 누르고 굴려 모양을 잡아요.'] },
+      { icon:'🧩', title:'작은 부분을 붙여요', lines:['눈, 귀, 다리 같은 작은 조각을 만들어요.', '붙일 곳을 긁고 → 흙물 바르고 → 꾹 붙여요.', '이음매를 손가락으로 문질러요.'], caution:'긁지 않고 붙이면 마를 때 떨어져요.' },
+      { icon:'🕳️', title:'두꺼운 곳은 속을 파요', lines:['2cm보다 두꺼운 곳은 밑에서 숟가락으로 파내요.', '또는 꼬챙이로 작은 숨구멍을 뚫어요.'], caution:'너무 두꺼우면 구울 때 터질 수 있어요!' }
+    ]
+  };
+  steps.push(...M[m]);
+
+  // 4. 종류별 추가
+  if (s === '컵') steps.push({ icon:'☕', title:'손잡이를 붙여요', lines:['흙가래를 만들어 손으로 납작하게 눌러요.', 'C자 모양으로 구부려요.', '컵 옆면 두 곳을 긁고 흙물을 발라요.', '손잡이를 꾹 붙여요.', '손가락이 쏙 들어가는지 확인해요.'], tip:'손잡이는 컵이 조금 굳은 뒤에 붙이면 더 쉬워요.' });
+  if (sel.category === '화분') steps.push({ icon:'🕳️', title:'물 빠지는 구멍을 뚫어요', lines:['화분 바닥 가운데를 빨대로 꾹 눌러 뚫어요.', '큰 화분은 구멍을 2~3개 뚫어요.'], caution:'구멍이 없으면 식물 뿌리가 썩어요!' });
+  if (s === '촛대') steps.push({ icon:'🕯️', title:'초 꽂을 자리를 만들어요', lines:['가운데에 진짜 초를 대고 꾹 눌러 구멍을 만들어요.', '초를 빼고 구멍을 조금 더 넓혀요.'], tip:'흙은 구우면 줄어들어서 구멍을 조금 크게 만들어야 해요.' });
+  if (s === '미니 항아리') steps.push({ icon:'🏺', title:'항아리 목을 만들어요', lines:['입구 위에 얇은 흙가래를 한 줄 올려요.', '긁고 흙물 발라 붙여요.', '손가락으로 살짝 바깥으로 펴서 입술 모양을 만들어요.'] });
+
+  // 5. 다듬기
+  steps.push({ icon:'🧽', title:'매끈하게 다듬어요', lines:['스펀지에 물을 조금만 묻혀요.', '가장자리와 입구를 살살 문질러요.', '갈라진 곳은 흙물을 발라 메워요.'], caution:'물을 너무 많이 쓰면 흙이 녹아 무너져요.' });
+
+  // 6. 무늬
+  const P = {
+    dots:{ icon:'🔵', title:'점 무늬를 찍어요', lines:['연필 뒤꼭지나 면봉을 준비해요.', '겉면에 콕콕 눌러 점을 찍어요.', '줄을 맞추거나 자유롭게 찍어요.'] },
+    stripes:{ icon:'〰️', title:'줄 무늬를 그어요', lines:['이쑤시개를 비스듬히 잡아요.', '겉면을 한 바퀴 돌며 선을 그어요.', '1~2cm 간격으로 여러 줄 그어요.'] },
+    waves:{ icon:'🌊', title:'물결 무늬를 그려요', lines:['포크를 준비해요.', '포크 끝을 대고 구불구불 움직여요.', '한 바퀴 빙 돌며 물결을 만들어요.'] },
+    flowers:{ icon:'🌸', title:'꽃 무늬를 붙여요', lines:['콩알만 한 흙 동그라미 5개를 만들어요.', '납작하게 눌러 꽃잎을 만들어요.', '붙일 곳을 긁고 흙물 바르고 꽃잎을 동그랗게 붙여요.', '가운데에 작은 동그라미를 붙여요.'] },
+    leaves:{ icon:'🍃', title:'나뭇잎을 찍어요', lines:['나뭇잎 뒷면(줄기 무늬가 있는 쪽)을 흙에 대요.', '밀대나 손가락으로 살짝 눌러요.', '줄기를 잡고 천천히 떼어내요.'] }
+  };
+  if (sel.pattern.key !== 'none') steps.push({ ...P[sel.pattern.key], tip:'흙이 조금 굳었을 때(만졌을 때 손에 묻지 않을 때) 하면 무늬가 깨끗해요.' });
+
+  // 7. 이름 새기기
+  steps.push({ icon:'✍️', title:'바닥에 이름을 써요', lines:['작품을 살짝 뒤집어요.', '이쑤시개로 바닥에 내 이름을 써요.'], tip:'구운 뒤에도 누구 작품인지 알 수 있어요.' });
+
+  // 8. 말리기
+  steps.push({ icon:'🌬️', title:'천천히 말려요', lines:['비닐을 살짝 덮어 그늘에 두어요.', '3일 뒤 비닐을 벗겨요.', '1~2주 동안 기다려요.', '색이 하얗게 변하고 손에 차갑지 않으면 다 마른 거예요.'], caution:'햇볕이나 난로 옆에서 말리면 갈라져요.' + (m === 'flat' ? ' 납작한 작품은 하루에 한 번 뒤집어 주세요.' : '') });
+
+  // 9. 초벌구이
+  steps.push({ icon:'🔥', title:'처음 굽기 (초벌구이)', teacher:true, lines:['선생님이 가마에 작품을 넣어요.', '약 800℃에서 구워요.', '하루 정도 지나면 단단해져요.'], caution:'가마는 아주 뜨거워요. 절대 만지지 않아요!' });
+
+  // 10. 유약
+  steps.push({ icon:'🖌️', title:`${sel.glaze.name} 유약을 발라요`, teacher:true, lines:['작품의 먼지를 젖은 스펀지로 닦아요.', `${sel.glaze.name} 유약을 잘 저어요.`, '붓으로 한 방향으로 발라요.', '마르면 한 번 더 발라요. (2~3번)', '바닥은 유약을 깨끗이 닦아내요.'], caution:'바닥에 유약이 묻으면 가마에 붙어 버려요! 유약을 만진 뒤에는 손을 꼭 씻어요.' });
+
+  // 11. 재벌구이
+  steps.push({ icon:'♨️', title:'두 번째 굽기 (재벌구이)', teacher:true, lines:['선생님이 다시 가마에 넣어요.', '약 1250℃의 아주 뜨거운 불로 구워요.', '유약이 녹아 반짝반짝 유리처럼 변해요.', '가마가 다 식을 때까지 1~2일 기다려요.'] });
+
+  // 12. 완성
+  const finish = ['가마에서 나온 작품을 확인해요.', '사진을 찍고 친구들에게 소개해요.'];
+  if (sel.category === '그릇') finish.push('음식을 담기 전에 깨끗이 씻어요.');
+  if (sel.category === '화분') finish.push('흙과 식물을 넣어 키워요. 🌱');
+  if (s === '자석장식') finish.push('선생님이 뒷면에 자석을 붙여 주세요. 🧲');
+  steps.push({ icon:'🎉', title:'완성!', lines:finish, tip:'처음 만든 디자인과 비교해 보세요. 어떤 점이 같고 다른가요?' });
+
+  return steps;
+}
+
+// ===================== 가이드 화면 =====================
+function startGuide() {
+  guideSteps = buildGuide();
+  guideIdx = 0;
+  document.getElementById('guide-title').innerText = sel.subCategory;
+  goToStep(8);
+  renderGuide();
+}
+
+function renderGuide() {
+  const st = guideSteps[guideIdx], total = guideSteps.length;
+  document.getElementById('g-icon').innerText = st.icon;
+  document.getElementById('g-num').innerText = `${guideIdx + 1}번째 / 모두 ${total}단계`;
+  document.getElementById('g-title').innerText = st.title;
+  document.getElementById('g-teacher').classList.toggle('hidden', !st.teacher);
+  document.getElementById('g-pic').innerHTML = picFor(st);
+  document.getElementById('g-lines').innerHTML = st.lines.map((l, i) => {
+    const isItem = l.startsWith('•');
+    return isItem
+      ? `<li class="guide-line text-stone-700 pl-10">${l.slice(1)}</li>`
+      : `<li class="guide-line text-stone-800 flex gap-3"><span class="shrink-0 w-9 h-9 rounded-full bg-amber-600 text-white font-bold flex items-center justify-center text-lg">${i + 1}</span><span>${l}</span></li>`;
+  }).join('');
+  const tip = document.getElementById('g-tip'), cau = document.getElementById('g-caution');
+  tip.classList.toggle('hidden', !st.tip); tip.innerHTML = st.tip ? '💡 <b>도움말:</b> ' + st.tip : '';
+  cau.classList.toggle('hidden', !st.caution); cau.innerHTML = st.caution ? '⚠️ <b>조심해요:</b> ' + st.caution : '';
+  document.getElementById('guide-bar').style.width = ((guideIdx + 1) / total * 100) + '%';
+  document.getElementById('guide-dots').innerHTML = guideSteps.map((g, i) =>
+    `<button onclick="jumpGuide(${i})" title="${g.title}" class="w-10 h-10 rounded-full text-lg flex items-center justify-center border-2 ${i < guideIdx ? 'bg-amber-200 border-amber-300' : i === guideIdx ? 'bg-amber-600 border-amber-700 text-white scale-110' : 'bg-white border-stone-200'}">${i < guideIdx ? '✔' : i + 1}</button>`).join('');
+  document.getElementById('btn-prev').style.visibility = guideIdx === 0 ? 'hidden' : 'visible';
+  document.getElementById('btn-next').innerText = guideIdx === total - 1 ? '모두 끝났어요! 🎉' : '다 했어요! 다음 ▶';
+}
+
+function moveGuide(d) {
+  if (window.speechSynthesis) speechSynthesis.cancel();
+  const n = guideIdx + d;
+  if (n >= guideSteps.length) {
+    document.getElementById('done-name').innerText = sel.subCategory; document.getElementById('done-jo').innerText = JS(sel.subCategory);
+    document.getElementById('done-svg').innerHTML = drawPot();
+    goToStep(9);
+    return;
+  }
+  if (n < 0) return;
+  guideIdx = n; renderGuide();
+}
+function jumpGuide(i) { if (window.speechSynthesis) speechSynthesis.cancel(); guideIdx = i; renderGuide(); }
+
+function speakStep() {
+  if (!window.speechSynthesis) { alert('이 브라우저는 읽어 주기를 지원하지 않아요.'); return; }
+  speechSynthesis.cancel();
+  const st = guideSteps[guideIdx];
+  const text = [st.title, ...st.lines.map(l => l.replace(/^•/, '').replace(/[\u{1F300}-\u{1FAFF}\u2600-\u27BF]/gu, '')), st.tip ? '도움말. ' + st.tip : '', st.caution ? '조심해요. ' + st.caution : ''].join('. ');
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ko-KR'; u.rate = 0.85;
+  speechSynthesis.speak(u);
+}
+
+function printGuide() {
+  if (!guideSteps.length) guideSteps = buildGuide();
+  document.getElementById('print-area').innerHTML = `
+    <h1 style="font-size:28px;font-weight:bold;margin-bottom:6px">🏺 ${sel.subCategory} 만들기 가이드</h1>
+    <p style="font-size:16px;margin-bottom:4px">이름: ____________ &nbsp;&nbsp; 날짜: ____________</p>
+    <p style="font-size:15px;margin-bottom:16px">모양: ${sel.shape} · 무늬: ${sel.pattern.name} · 색: ${sel.glaze.name} · 방법: ${methodNames[sel.method]} · 흙: ${sel.clay}</p>
+    <div style="width:180px;height:180px;margin-bottom:16px">${drawPot()}</div>
+    ${guideSteps.map((g, i) => `<div class="print-step" style="border:2px solid #e7d3b1;border-radius:14px;padding:12px 16px;margin-bottom:10px">
+      <div style="width:150px;height:112px;float:right;margin-left:10px">${picFor(g)}</div>
+      <div style="font-size:20px;font-weight:bold">☐ ${i + 1}. ${g.icon} ${g.title}${g.teacher ? ' (선생님과 함께)' : ''}</div>
+      <ul style="font-size:16px;line-height:1.7;margin:6px 0 0 18px">${g.lines.map(l => `<li>${l.replace(/^•\s*/, '')}</li>`).join('')}</ul>
+      ${g.tip ? `<div style="font-size:15px;color:#2f6b4f">💡 ${g.tip}</div>` : ''}
+      ${g.caution ? `<div style="font-size:15px;color:#a8324a">⚠️ ${g.caution}</div>` : ''}
+      <div style="clear:both"></div>
+    </div>`).join('')}`;
+  window.print();
+}
+
+function resetAll() { sel = {}; guideSteps = []; goToStep(1); }
+</script>
+
+<script>
+// 혜광전과로 돌아가는 단추 (늘 보여요): ◀ 이전 = 이 앱의 단계 화면, 🏠 홈 = 앱 고르기 화면
+(function () {
+  const go = h => { if (window.parent !== window) { try { window.parent.postMessage({ hub: 'close', h }, '*'); } catch (e) {} return; } location.href = encodeURI('혜광전과.html') + h; };
+  const box = document.createElement('div'); box.id = 'hub-nav';
+  box.style.cssText = "position:fixed;left:8px;bottom:8px;z-index:20000;display:flex;gap:5px";
+  const mk = (t, h) => { const b = document.createElement('button'); b.textContent = t; b.onclick = () => go(h);
+    b.style.cssText = "background:#fff;border:2px solid #4a3428;border-radius:99px;padding:3px 11px;font:15px 'Jua','Malgun Gothic',sans-serif;color:#4a3428;cursor:pointer;box-shadow:0 2px 0 #f6c85f"; return b; };
+  // 이름 표시(👤) 바로 오른쪽에 나란히 놓아요
+  const place = () => { const c = document.getElementById('sy-chip'); box.style.left = (c ? Math.round(c.getBoundingClientRect().right + 6) : 8) + 'px'; };
+  setInterval(place, 800);
+  box.appendChild(mk('◀ 이전', '#app=pottery')); box.appendChild(mk('🏠 홈', '#apps'));
+  (document.body ? Promise.resolve() : new Promise(r => document.addEventListener('DOMContentLoaded', r))).then(() => { document.body.appendChild(box); document.body.style.paddingBottom = '56px'; });
+  // 혜광전과에서 단계를 골라 들어오면 그 단계로 바로 가요
+  try { const raw = sessionStorage.getItem('hub-go'); const g2 = raw && JSON.parse(raw);
+    if (g2 && g2.app === 'pottery' && g2.call) { sessionStorage.removeItem('hub-go');
+      const run = () => setTimeout(() => { try { (new Function(g2.call))(); } catch (e) {} }, 450);
+      if (document.readyState === 'complete') run(); else addEventListener('load', run, { once: true }); } } catch (e) {}
+})();
+</script>
+</body>
+</html>
