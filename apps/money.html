@@ -760,8 +760,8 @@ const LEVELS = [
   { t:'천 원 + 오천 원', e:'💵', run: () => L_money({ dens:[5000, 1000], modes:['count', 'make'], rounds:6 }) },
   { t:'만 원 + 오만 원', e:'💴', run: () => L_money({ dens:[50000, 10000], modes:['count', 'make'], rounds:6 }) },
   { t:'모두 섞어서', e:'💰', run: () => L_money({ dens:[50000, 10000, 5000, 1000, 500, 100], modes:['count', 'make'], rounds:6, mix:true }) },
-  { t:'혜광 가게 (물건 2개)', e:'🏪', run: () => L_shop(2, 100) },
-  { t:'혜광 가게 (물건 3개)', e:'🛒', run: () => L_shop(3, 10) },
+  { t:'밤섬 가게 (물건 2개)', e:'🏪', run: () => L_shop(2, 100) },
+  { t:'밤섬 가게 (물건 3개)', e:'🛒', run: () => L_shop(3, 10) },
   { t:'거스름돈 주기', e:'🧾', run: L_change }
 ];
 const COMMON_LINES = ['맞아요', '딱 맞아요', '참 잘했어요', '최고예요', '멋져요', '고맙습니다', '다시 해 봐요', '다시 생각해 봐요', '다시 계산해 봐요', '더 커요', '더 작아요', '반짝이는 곳을 봐요'];
@@ -1014,14 +1014,14 @@ function L_money(cfg) {
   run();
 }
 
-// ===================== 12·13단계: 혜광 가게 =====================
+// ===================== 12·13단계: 밤섬 가게 =====================
 const GOODS = [['과자', '🍪'], ['우유', '🥛'], ['빵', '🍞'], ['라면', '🍜'], ['사과', '🍎'], ['바나나', '🍌'], ['아이스크림', '🍦'], ['주스', '🧃'], ['연필', '✏️'], ['공책', '📒'], ['사탕', '🍬'], ['초콜릿', '🍫'], ['주먹밥', '🍙'], ['요구르트', '🥤'], ['도넛', '🍩'], ['컵라면', '🥡']];
 function shopBg() {
   const shelf = (y) => `<div style="position:absolute;left:30px;right:30px;top:${y}px;height:14px;background:#b87a44;border-radius:6px"></div>`;
   const deco = shuffle(GOODS).slice(0, 14).map((g, i) => `<span style="position:absolute;left:${60 + (i % 7) * 170}px;top:${i < 7 ? 160 : 232}px;font-size:46px;opacity:.75">${g[1]}</span>`).join('');
   $('bg').innerHTML = `<div style="position:absolute;inset:92px 0 0 0;background:linear-gradient(#fef3c7,#fde68a)"></div>
     <div style="position:absolute;left:0;right:0;top:92px;height:46px;background:repeating-linear-gradient(90deg,#ef4444 0 60px,#fff 60px 120px);box-shadow:0 6px 8px #0002"></div>
-    <div style="position:absolute;left:470px;top:98px;width:340px;height:52px;background:#7c2d12;color:#fde68a;border-radius:14px;border:4px solid #fde68a;font-size:34px;text-align:center;line-height:44px">🏪 혜광 가게</div>
+    <div style="position:absolute;left:470px;top:98px;width:340px;height:52px;background:#7c2d12;color:#fde68a;border-radius:14px;border:4px solid #fde68a;font-size:34px;text-align:center;line-height:44px">🏪 밤섬 가게</div>
     ${shelf(214)}${shelf(286)}<div style="opacity:.9">${deco}</div>
     <div style="position:absolute;left:0;right:0;top:300px;height:200px;background:linear-gradient(#c58b55,#a86f3c);border-top:10px solid #7c4a1e"></div>
     <div style="position:absolute;left:0;right:0;top:500px;bottom:0;background:#e7d3b3"></div>`;
