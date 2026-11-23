@@ -621,7 +621,7 @@ document.addEventListener('keydown',ev=>{
 });
 </script>
 <script>
-// 혜광전과로 돌아가는 단추 (늘 보여요): ◀ 이전 = 이 앱의 단계 화면, 🏠 홈 = 앱 고르기 화면
+// 초승달 전과로 돌아가는 단추 (늘 보여요): ◀ 이전 = 이 앱의 단계 화면, 🏠 홈 = 앱 고르기 화면
 (function () {
   const go = h => { if (window.parent !== window) { try { window.parent.postMessage({ hub: 'close', h }, '*'); } catch (e) {} return; } location.href = encodeURI('혜광전과.html') + h; };
   const box = document.createElement('div'); box.id = 'hub-nav';
@@ -633,7 +633,7 @@ document.addEventListener('keydown',ev=>{
   setInterval(place, 800);
   box.appendChild(mk('◀ 이전', '#app=scam')); box.appendChild(mk('🏠 홈', '#apps'));
   (document.body ? Promise.resolve() : new Promise(r => document.addEventListener('DOMContentLoaded', r))).then(() => { document.body.appendChild(box); document.body.style.paddingBottom = '56px'; });
-  // 혜광전과에서 단계를 골라 들어오면 그 단계로 바로 가요
+  // 초승달 전과에서 단계를 골라 들어오면 그 단계로 바로 가요
   try { const raw = sessionStorage.getItem('hub-go'); const g2 = raw && JSON.parse(raw);
     if (g2 && g2.app === 'scam' && g2.call) { sessionStorage.removeItem('hub-go');
       const run = () => setTimeout(() => { try { (new Function(g2.call))(); } catch (e) {} }, 450);
